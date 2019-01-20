@@ -1,6 +1,7 @@
 
 -- Parametros
 
+-- Este procedimiento tiene errores
 CREATE OR REPLACE PROCEDURE SCOTT.SP_DEMO
 ( P_VALOR IN NUMBER )
 AS
@@ -138,5 +139,4 @@ Hacer un procedimiento que retorne 2 parametros,
 en primero es el nombre o IP del equipo cliente,
 y el segundo es el usuario del SO del cliente.
 */
-
 

@@ -1,0 +1,28 @@
+CREATE OR REPLACE PROCEDURE SCOTT.MOSTRAR_IP_SO
+AS
+  IP_1 VARCHAR2(20);
+  SO_1 VARCHAR2(100);
+  user_1 varchar2(100);
+BEGIN
+  
+  /*
+  SELECT UTL_INADDR.get_host_address INTO IP_1 
+  from dual;
+  */
+  
+  select SUBSTR(dbms_utility.port_string,INSTR(dbms_utility.port_string,'/')+1,100) 
+  INTO SO_1  from dual;
+  
+  select SUBSTR(sys_context( 'userenv', 'os_user' ),
+    INSTR(sys_context( 'userenv', 'os_user' ),'\')+1,100) 
+  into user_1 from dual;
+
+  DBMS_OUTPUT.PUT_LINE(IP_1 );
+  DBMS_OUTPUT.PUT_LINE(SO_1 );
+  DBMS_OUTPUT.PUT_LINE(user_1 );
+END;
+/
+
+
+call SCOTT.MOSTRAR_IP_SO();
+
