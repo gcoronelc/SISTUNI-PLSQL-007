@@ -6,6 +6,10 @@ CLASE 01
 - Esquema de Trabajo
 - Iniciando con PL/SQL
 - Introduccion a PL/SQL
+- Tipos de Parámetros
+- Variables
+- Asignar datos a variables
+
 
 
 
