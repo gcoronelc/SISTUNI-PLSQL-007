@@ -130,3 +130,13 @@ WHEN OTHERS THEN
   DBMS_OUTPUT.PUT_LINE('2: ' || V_VALOR );
 END;
 /
+
+
+/*
+Tarea 02
+Hacer un procedimiento que retorne 2 parametros,
+en primero es el nombre o IP del equipo cliente,
+y el segundo es el usuario del SO del cliente.
+*/
+
+
