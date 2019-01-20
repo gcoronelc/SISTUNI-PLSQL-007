@@ -1,0 +1,11 @@
+CLASE 01
+-------------------------------------
+- Repositorio del Curso
+- Introducción a Oracle
+- Herramientas a utilizar
+- Esquema de Trabajo
+- Iniciando con PL/SQL
+- Introduccion a PL/SQL
+
+
+
