@@ -25,6 +25,27 @@ Modificar la función de la Tarea 01, para
 que promedie las 3 mejores notas.
 
 
+TAREA 04
+=============================================
+Hacer una función que permita obtener la 
+condición de un alumno en base a su nota:
+
+	RANGO                CONDICION
+-------------------------------------------
+	NOTA >= 14.0         APROBADO
+	10.0 <= NOTA < 14.0  ASISTENTE
+	NOTA < 10.0          DESAPROBADO 
+-------------------------------------------
+
+Debe aplicar la estructura CASE.
+
+
+
+
+
+	
+	
+
 
 
 
