@@ -5,3 +5,20 @@ obtener el promedio de 4 notas.
 
 
 
+TAREA 02
+==============================================
+Crear un procedimiento para calcular el
+importe de una venta.
+Datos de Entrada:
+ - Precio
+ - Cantidad
+Datos de Salida
+ - Importe
+ - Impuesto
+ - Total
+El precio de venta ya incluye el impuesto.
+
+
+
+
+
