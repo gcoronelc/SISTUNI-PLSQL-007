@@ -42,6 +42,15 @@ Debe aplicar la estructura CASE.
 
 
 
+TAREA 05
+==================================================
+Realizar una función que permita calcular la suma 
+de los numeros comprendidos entre A y B, siendo
+A y B parámetros de la función.
+
+
+
+
 
 	
 	
