@@ -30,12 +30,12 @@ TAREA 04
 Hacer una función que permita obtener la 
 condición de un alumno en base a su nota:
 
-	RANGO                CONDICION
--------------------------------------------
-	NOTA >= 14.0         APROBADO
-	10.0 <= NOTA < 14.0  ASISTENTE
-	NOTA < 10.0          DESAPROBADO 
--------------------------------------------
+	RANGO                CONDICION         RANGO 2
+---------------------------------------------------------
+	NOTA >= 14.0         APROBADO          [14.0, 20.0]
+	10.0 <= NOTA < 14.0  ASISTENTE         [10.0, 14.0>
+	NOTA < 10.0          DESAPROBADO       [0.0, 10.0>
+---------------------------------------------------------
 
 Debe aplicar la estructura CASE.
 
