@@ -1,0 +1,7 @@
+TAREA 01
+=============================================
+Crear una función que permita
+obtener el promedio de 4 notas.
+
+
+
