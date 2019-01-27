@@ -50,6 +50,12 @@ A y B parámetros de la función.
 
 
 
+TAREA 06
+==================================================
+Desarrollar una función para calcular el MCD de
+dos numeros enteros positivos.
+
+
 
 
 	
