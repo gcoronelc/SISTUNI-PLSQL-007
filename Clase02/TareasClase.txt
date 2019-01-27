@@ -19,6 +19,13 @@ Datos de Salida
 El precio de venta ya incluye el impuesto.
 
 
+TAREA 03
+=============================================
+Modificar la función de la Tarea 01, para 
+que promedie las 3 mejores notas.
+
+
+
 
 
 
