@@ -11,5 +11,14 @@ CLASE 01
 - Asignar datos a variables
 
 
+CLASE 02
+-------------------------------------
+- Repaso de Funciones y Procedimientos
+- Estructuras de Control
+- Secencias
+- Tablas Temporales
+- Registros
+- Excepciones
+
 
 
