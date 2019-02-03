@@ -1,0 +1,107 @@
+-- EXECUTE IMMEDIATE
+
+
+BEGIN
+
+  EXECUTE IMMEDIATE '
+  	CREATE TABLE DEMO(
+  		A VARCHAR2(100)
+  	)';
+	
+END;
+
+
+DROP TABLE DEMO PURGE;
+
+
+-- SELECT
+-- Debe retornar exactamente una sola fila
+
+-- El error se debe a que el SELECT retorna
+-- muchas filas
+
+DECLARE
+  v_salario NUMBER;
+BEGIN
+  SELECT SAL INTO v_salario
+  FROM scott.emp;
+END;
+
+
+-- El error se debe a que el SELECT 
+-- no retorna ninguna fila
+
+DECLARE
+  v_salario NUMBER;
+BEGIN
+  SELECT SAL INTO v_salario
+  FROM scott.emp
+  WHERE EMPNO = 123456;
+END;
+
+
+-- RETURNING
+
+SELECT * FROM SCOTT.EMP;
+-- 7369
+
+DECLARE 
+
+  V_EMPNO   NUMBER := 7369;
+  V_SAL_OLD NUMBER;
+  V_SAL_NEW NUMBER;
+
+BEGIN
+  
+  SELECT SAL INTO V_SAL_OLD
+  FROM SCOTT.EMP WHERE EMPNO = V_EMPNO;
+
+  UPDATE SCOTT.EMP 
+  SET SAL = SAL * 1.1
+  WHERE EMPNO = V_EMPNO
+  RETURNING SAL INTO V_SAL_NEW;
+  
+  DBMS_OUTPUT.PUT_LINE('DE ' || V_SAL_OLD || ' A ' || V_SAL_NEW);
+  
+END;
+
+
+
+-- DB LINK
+
+CREATE PUBLIC DATABASE LINK LNK_DIEGO
+CONNECT TO SYSTEM IDENTIFIED BY oracle
+USING '(DESCRIPTION =
+         (ADDRESS = (PROTOCOL = TCP)(HOST = 172.17.3.86)(PORT = 1521))
+         (CONNECT_DATA =
+           (SERVER = DEDICATED)
+           (SERVICE_NAME = orcl)
+         )
+       )';
+
+
+SELECT * FROM SCOTT.EMP@LNK_DIEGO;
+
+
+
+
+CREATE PUBLIC DATABASE LINK LNK_DIEGO2
+CONNECT TO SYSTEM IDENTIFIED BY oracle
+USING 'DIEGO';
+       
+       
+SELECT * FROM SCOTT.EMP@LNK_DIEGO2;    
+     
+
+
+-- SINONIMOS
+
+CREATE OR REPLACE PUBLIC SYNONYM DIEGO_SCOTT_EMP
+FOR SCOTT.EMP@LNK_DIEGO;
+
+SELECT * FROM DIEGO_SCOTT_EMP;
+
+
+
+     
+       
