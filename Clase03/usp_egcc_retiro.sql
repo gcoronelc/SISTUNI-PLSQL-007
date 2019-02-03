@@ -24,8 +24,8 @@ begin
 	        vch_cuenestado, chr_cuenclave
 	into v_saldo, v_moneda, v_estado, v_clave
 	from eureka.cuenta
-	where chr_cuencodigo = p_cuenta;
-	--for update;
+	where chr_cuencodigo = p_cuenta
+	for update;
   -- Retardo
   APEX_UTIL.PAUSE(5);  
   -- Verificación
