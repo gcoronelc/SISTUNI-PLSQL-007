@@ -24,4 +24,9 @@ CLASE 02
 
 CLASE 03
 -------------------------------------
-- 
+- SQL en PL/SQL 
+- Transacciones
+- Cursores
+
+
+
