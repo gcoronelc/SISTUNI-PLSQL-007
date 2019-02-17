@@ -1,0 +1,16 @@
+
+TAREA 01
+--------------------------------
+
+Crear un PKG_DEMO02 en EDUCA y 
+agregarle un procedimiento que 
+permita obtener la cantidad de 
+dinero proyecto y la cantidad 
+de dinero recaudado del 
+proyecto EDUCA.
+
+
+
+
+
+
