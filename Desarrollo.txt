@@ -35,7 +35,7 @@ CLASE 04
 - Paquetes
 - Manejo de varios datos con SPLIT
 - Funciones que retornan cursores
-
+- Desencadenantes
 
 
 
