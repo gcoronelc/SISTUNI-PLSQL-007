@@ -1,0 +1,19 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="5564DA28-669C-9FC6-CDA5-7AB6CF0393EA" containerWithKeyObject="F4D0C23B-FCF6-A863-3500-288C4ABCD5F7" localFKIndex="CA0731EE-EED8-0890-8034-A83E2D55DEF3" name="POL_CLIENT_FK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>POL_CLIENT_FK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<referredTableLongName>PROTECTA.CLIENT</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>1CF2A780-7DA1-852E-D9AB-3BB51FAA9E20</referredTableID>
+<keyObject>C91E824E-07D4-58F8-F0F6-1E7EC1C4B854</keyObject>
+<referredKeyID>C91E824E-07D4-58F8-F0F6-1E7EC1C4B854</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>SCLIENT</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,104 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="CLIENT" directorySegmentName="seg_0" id="1CF2A780-7DA1-852E-D9AB-3BB51FAA9E20">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>8BC85ACE-242E-B435-414E-13CB1AF84EF3</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="SSEXCLIEN" id="02258FCE-6408-4948-F2A0-640BA26BC9C1">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SLASTNAME" id="028321AA-0537-264F-6DA0-5803C7D76D59">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DDEATHDAT" id="10D9061D-87CC-DC85-D707-DF95042939C4">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SLEGALNAME" id="38D4854F-0024-7C5D-2D01-2C3C86D6E44B">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NPERSON_TYP" id="64073AFE-71A3-5DBA-7C61-06DA1ED82F9B">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DCOMPDATE" id="7F3114CA-32A3-B02E-D5EE-C8D76D074D5C">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SLICENSE" id="833AF4C8-5315-176F-5192-8E2D40427B5C">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCLIENAME" id="8BDF7384-20BA-2F95-EB00-5AFEAB3D7666">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCLIENT" id="9AFCA957-CCE4-FF28-236A-D858B1A10D26">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SFIRSTNAME" id="A5C9EC57-0A9B-CBC0-A42F-C5C89C5E0DED">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NNATIONALITY" id="B13F4B4B-64DF-DF23-0D8C-A20F18048921">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SLASTNAME2" id="E7078EB8-163D-CCF4-10A7-29A8AA7410B7">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DBIRTHDAT" id="EB0715D7-AF60-2F05-D48A-D1D271C519D1">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="CLIENT_PK" id="9B5DEC40-EAA1-B0CF-E7A2-07601953674D">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+</IndexProxy>
+</indexProxies>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="CLIENT_PK" id="C91E824E-07D4-58F8-F0F6-1E7EC1C4B854">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<existingIndex>9B5DEC40-EAA1-B0CF-E7A2-07601953674D</existingIndex>
+<indexSegment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

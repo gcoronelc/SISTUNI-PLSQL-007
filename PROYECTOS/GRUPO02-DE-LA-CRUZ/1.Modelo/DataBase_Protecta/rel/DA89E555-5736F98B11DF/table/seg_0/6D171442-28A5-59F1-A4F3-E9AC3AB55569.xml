@@ -1,0 +1,222 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="6D171442-28A5-59F1-A4F3-E9AC3AB55569" schemaObject="06795D3D-E570-7EDF-F596-F2C206CF6375" name="ADDRESS">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>ADDRESS</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="SKEYADDRESS" id="53EDBFA4-6E71-EAD0-430F-1B6C9A029889">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>SKEYADDRESS</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>50 BYTE</dataTypeSize>
+<ownDataTypeParameters>50 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SSTREET" id="3E1B6A12-E7E7-3260-CBE8-6CD91CEB9375">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>SSTREET</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>40 BYTE</dataTypeSize>
+<ownDataTypeParameters>40 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SSTREET1" id="7B35B344-B0C1-9958-43AC-7B59D8481236">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>SSTREET1</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>40 BYTE</dataTypeSize>
+<ownDataTypeParameters>40 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SCLIENT" id="52E48A8A-B2A6-490D-3943-94354F25FC3D">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>SCLIENT</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>14 BYTE</dataTypeSize>
+<ownDataTypeParameters>14 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6878316E-A9C1-C5A6-B21A-30F3B7CD9E4C" referredColumn="9AFCA957-CCE4-FF28-236A-D858B1A10D26"/>
+</associations>
+</Column>
+<Column name="SE_MAIL" id="095C0EC9-BFA9-CAC6-E4FE-AA26AF913E63">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>SE_MAIL</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>60 BYTE</dataTypeSize>
+<ownDataTypeParameters>60 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DCOMPDATE" id="D2E4627C-1FC2-20BE-EAFA-D565C4D21ACE">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>DCOMPDATE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NPROVINCE" id="4839BA71-6F59-4FB9-BE20-AB9E5B408BEB">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>NPROVINCE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,5,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NLOCAL" id="F05F7ACD-FCF6-454C-4726-F0282AFBF24B">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>NLOCAL</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,5,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NMUNICIPALITY" id="E2E2F0B9-C107-9548-BA14-4B5DB8413FD1">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>NMUNICIPALITY</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,10,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SDESCADD" id="B8F6F32B-BE22-F2D3-ACA1-A8FF49507221">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>SDESCADD</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>100 BYTE</dataTypeSize>
+<ownDataTypeParameters>100 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SREFERENCE" id="F8E41065-0A0D-EA17-B437-CF26CD1A1FFB">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>ADDRESS</sourceObjSchema>
+<sourceObjName>SREFERENCE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>30 BYTE</dataTypeSize>
+<ownDataTypeParameters>30 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="1AAEEC48-A548-7FB1-FA36-00AEBD4E330A" name="ADDRESS_PK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>ADDRESS_PK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="53EDBFA4-6E71-EAD0-430F-1B6C9A029889"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="7ABE37BB-28FB-C812-9432-13261B199A16" schemaObject="06795D3D-E570-7EDF-F596-F2C206CF6375" name="ADDRESS_PK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>ADDRESS_PK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="53EDBFA4-6E71-EAD0-430F-1B6C9A029889"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="AF7A6F5A-C483-7831-7938-EDA64EB9D2D6" name="ADDRESS_FK">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="52E48A8A-B2A6-490D-3943-94354F25FC3D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,54 @@
+-- ==========================================================
+-- 1. Cargar datos a la tabla: RHTR_ETAPA_CONV 
+-- ==========================================================
+
+
+insert into RHTR_ETAPA_CONV (CO_ETAPA, DE_ETAPA, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, IN_ESTADO)
+values (1, 'EN INICIO', 'ADMIN   ', to_date('17-02-2019', 'dd-mm-yyyy'), null, null, '1');
+
+insert into RHTR_ETAPA_CONV (CO_ETAPA, DE_ETAPA, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, IN_ESTADO)
+values (2, 'EN PROCESO', 'ADMIN   ', to_date('17-02-2019', 'dd-mm-yyyy'), null, null, '1');
+
+insert into RHTR_ETAPA_CONV (CO_ETAPA, DE_ETAPA, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, IN_ESTADO)
+values (3, 'FINALIZADO', 'ADMIN   ', to_date('17-02-2019', 'dd-mm-yyyy'), null, null, '1');
+
+COMMIT;
+
+-- ==========================================================
+-- 2.Cargar datos a la tabla: RHTR_TIPO_CONV 
+-- ==========================================================
+
+insert into RHTR_TIPO_CONV (CO_TIPO, DE_TIPO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, IN_ESTADO)
+values ('1', 'CAP', 'ADMIN', to_date('17-02-2019', 'dd-mm-yyyy'), null, null, '1');
+
+insert into RHTR_TIPO_CONV (CO_TIPO, DE_TIPO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, IN_ESTADO)
+values ('2', 'CAS', 'ADMIN', to_date('17-02-2019', 'dd-mm-yyyy'), null, null, '1');
+
+insert into RHTR_TIPO_CONV (CO_TIPO, DE_TIPO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, IN_ESTADO)
+values ('3', 'PRACTICAS', 'ADMIN', to_date('17-02-2019', 'dd-mm-yyyy'), null, null, '1');
+
+COMMIT;
+
+-- ==========================================================
+-- 3.Cargar datos a la tabla: RHTM_ESPECIALIDAD 
+-- ==========================================================
+
+insert into RHTM_ESPECIALIDAD (CO_ESPECIALIDAD, DE_ESPECIALIDAD, IN_ESTADO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, NU_SECUENCIA, NU_ANIO)
+values (991, 'JAVA DEVELOPER', '1', 'ADMIN', to_date('17-02-2019 13:14:55', 'dd-mm-yyyy hh24:mi:ss'), null, null, 1, 2018);
+
+insert into RHTM_ESPECIALIDAD (CO_ESPECIALIDAD, DE_ESPECIALIDAD, IN_ESTADO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, NU_SECUENCIA, NU_ANIO)
+values (992, 'SPRING FRAMEWORK', '1', 'ADMIN', to_date('17-02-2019 13:19:01', 'dd-mm-yyyy hh24:mi:ss'), null, null, 2, 2018);
+
+insert into RHTM_ESPECIALIDAD (CO_ESPECIALIDAD, DE_ESPECIALIDAD, IN_ESTADO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, NU_SECUENCIA, NU_ANIO)
+values (993, 'ANGULAR JS', '1', 'ADMIN', to_date('17-02-2019 13:19:16', 'dd-mm-yyyy hh24:mi:ss'), null, null, 3, 2018);
+
+insert into RHTM_ESPECIALIDAD (CO_ESPECIALIDAD, DE_ESPECIALIDAD, IN_ESTADO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, NU_SECUENCIA, NU_ANIO)
+values (994, 'SQL SERVER', '1', 'ADMIN', to_date('17-02-2019 13:20:00', 'dd-mm-yyyy hh24:mi:ss'), null, null, 4, 2018);
+
+insert into RHTM_ESPECIALIDAD (CO_ESPECIALIDAD, DE_ESPECIALIDAD, IN_ESTADO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, NU_SECUENCIA, NU_ANIO)
+values (995, 'ANDROID ADVANCE', '1', 'ADMIN', to_date('17-02-2019 13:21:46', 'dd-mm-yyyy hh24:mi:ss'), null, null, 5, 2018);
+
+insert into RHTM_ESPECIALIDAD (CO_ESPECIALIDAD, DE_ESPECIALIDAD, IN_ESTADO, US_CREACION, FE_CREACION, US_UPDATE, FE_UPDATE, NU_SECUENCIA, NU_ANIO)
+values (996, 'GESTION DE PROYECTOS', '1', 'ADMIN', to_date('17-02-2019 13:22:02', 'dd-mm-yyyy hh24:mi:ss'), null, null, 6, 2018);
+
+COMMIT;

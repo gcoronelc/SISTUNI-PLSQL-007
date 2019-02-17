@@ -1,0 +1,8 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="DataBase_Protecta" id="F3F5C1BB-1E98-2B89-BBE1-A9D0A8BE26B7" version="3.5">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:00 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>F3F5C1BB-1E98-2B89-BBE1-A9D0A8BE26B7</designId>
+</OSDM_Design>

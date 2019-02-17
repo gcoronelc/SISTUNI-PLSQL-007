@@ -1,0 +1,74 @@
+
+--TABLA TRANSPORTISTAS 
+CREATE TABLE TRANSPORTISTAS(
+id_transportista NUMBER,
+commpañia VARCHAR2(40),
+contacto VARCHAR2(50),
+direccion VARCHAR2(60),
+localidad VARCHAR2(40),
+estado VARCHAR(15),
+cod_postal NUMBER,
+telefono VARCHAR2(9),
+constraint pk_itrans primary key(id_transportista)
+)
+
+--CREAR UN REGISTRO 
+PROCESO COMPLEJO
+
+
+
+CREATE OR REPLACE PROCEDURE SCOTT.TRANSPORISTA
+(PR_id_transportista IN TRANSPORTISTAS.id_transportista%TYPE)
+
+AS
+
+PR_compañia TRANSPORTISTAS.compañia%TYPE
+BEGIN
+SELECT  compañia into PR_compañia
+FROM TRANSPORTISTAS WHERE PR_id_transportista=id_transportista;
+if(compañia LIKE 'Bus%')
+THEN
+UPDATE SCOTT.TRANSPORTISTAS
+SET PR_compañia = 'NUEVA EMPRESA';
+
+EXCEPTION 
+WHEN NO_DATA_FOUND
+THEN
+RAISE_APPLICATION_ERROR(-20008,'PRODUCTO NO REGISTRADO');
+
+
+END;
+
+
+
+------------------------------------------------------------
+--ELIMINANDO 
+CREATE OR REPLACE PROCEDURE SCOTT.PROC_SIMPLE2
+(
+
+PR_id_empleado in EMPLEADOS.id_empleado%TYPE
+
+)
+
+AS
+datos varchar2(25);
+BEGIN
+SELECT   nombre_empleado INTO datos  FROM EMPLEADOS
+WHERE id_empleado=PR_id_empleado;
+IF (datos LIKE'J%')
+THEN
+DELETE  FROM SCOTT.EMPLEADOS
+WHERE id_empleado=PR_id_empleado;
+END IF;
+EXCEPTION 
+WHEN NO_DATA_FOUND
+THEN
+RAISE_APPLICATION_ERROR(-20008,'PRODUCTO NO REGISTRADO');
+
+END;
+
+BEGIN
+SCOTT.PROC_SIMPLE2(64);
+END;
+SELECT*FROM EMPLEADOS;
+

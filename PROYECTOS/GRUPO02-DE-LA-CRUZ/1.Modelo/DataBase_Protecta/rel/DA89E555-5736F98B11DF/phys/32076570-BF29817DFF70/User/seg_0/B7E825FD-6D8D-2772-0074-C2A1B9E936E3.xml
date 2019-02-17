@@ -1,0 +1,9 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<UserOraclev10g class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UserOraclev10g" name="PROTECTA" directorySegmentName="seg_0" id="B7E825FD-6D8D-2772-0074-C2A1B9E936E3">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjName>PROTECTA</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:35 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+</UserOraclev10g>

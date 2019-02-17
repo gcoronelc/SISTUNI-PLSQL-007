@@ -1,0 +1,19 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="240E75D8-F0A1-8D02-FD17-AE1D3C5E0A63" containerWithKeyObject="9A3C927D-21DE-2AA2-8AA9-CB085966F6B9" localFKIndex="447DB673-7B95-CC8B-CA20-78A7C56F4229" name="POLICY_FK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>POLICY_FK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<referredTableLongName>PROTECTA.POLICY</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>F4D0C23B-FCF6-A863-3500-288C4ABCD5F7</referredTableID>
+<keyObject>7EC1BC5A-6E2B-FBCD-3D9A-D3D9C34412AE</keyObject>
+<referredKeyID>7EC1BC5A-6E2B-FBCD-3D9A-D3D9C34412AE</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>NPOLICY</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

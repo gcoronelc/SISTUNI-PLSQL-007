@@ -1,0 +1,197 @@
+
+CREATE OR REPLACE PACKAGE PKG_SOAT AS 
+   --CRUD POLICY
+   PROCEDURE INS_POLICY
+   (
+    P_npolicy       NUMBER,
+    P_sclient       CHAR,
+    P_dchangdat     DATE,
+    P_dcompdate     DATE,
+    P_dstartdate    DATE,
+    P_dexpirdat     DATE,
+    P_dissuedat     DATE,
+    P_dnulldate     DATE,
+    P_npremium      NUMBER
+    );
+    
+   PROCEDURE SEL_POLICY
+   (
+    P_npolicy       NUMBER,
+    P_mensaje		OUT VARCHAR2,
+    P_reg			OUT SYS_REFCURSOR	
+   );
+   
+   PROCEDURE UPD_POLICY
+   (
+    P_NPOLICY      NUMBER,
+    P_dstartdate   DATE
+   );
+    
+   --CRUD CLIENT
+    PROCEDURE INS_CLIENT
+    (
+      P_sclient      CHAR,
+      P_dbirthdat    DATE,
+      P_scliename    CHAR,
+      P_sfirstname   CHAR,
+      P_slastname    CHAR,
+      P_slastname2   CHAR,
+      P_slegalname   VARCHAR2,
+      P_dcompdate    DATE,
+      P_ddeathdat    DATE,
+      P_slicense     CHAR,
+      P_ssexclien    CHAR,
+      P_nperson_typ  NUMBER
+    );
+   
+   PROCEDURE SEL_CLIENT
+   (
+    P_document       NUMBER,
+    P_mensaje		OUT VARCHAR2,
+    P_reg			OUT SYS_REFCURSOR
+   );
+   
+   PROCEDURE UPD_CLIENT
+   (
+    P_DOCUMENTO    CHAR,
+    P_sfirstname   CHAR,
+    P_slastname    CHAR,
+    P_slastname2   CHAR,
+    P_slegalname   VARCHAR2,
+    P_ddeathdat    DATE
+   );
+   
+   --CRUD ADDRESS
+   PROCEDURE INS_ADDRESS
+   (
+      P_skeyaddress   CHAR,
+      P_sstreet       CHAR,
+      P_sstreet1      CHAR,
+      P_sclient       CHAR,
+      P_se_mail       CHAR,
+      P_dcompdate     DATE,
+      P_nprovince     NUMBER,--falta maestra
+      P_nlocal        NUMBER,--falta maestra
+      P_nmunicipality NUMBER,--falta maestra
+      P_sdescadd      CHAR,
+      P_sreference    VARCHAR2
+   );
+   
+   PROCEDURE UPD_ADDRESS
+   (
+    P_DOCUMENTO    CHAR,
+    P_sstreet      CHAR
+   );
+   
+   --CRUD PHONES
+    PROCEDURE INS_PHONES
+   (
+      p_skeyaddress     CHAR,
+      p_sphone          CHAR,
+      p_dcompdate       DATE 
+   );
+   
+   PROCEDURE UPD_PHONES
+   (
+    P_DOCUMENTO    CHAR,
+    P_sphone       CHAR
+   );
+   
+   --CRUD AUTO
+   PROCEDURE INS_AUTO
+   (
+      p_npolicy      NUMBER,
+      p_nautozone    NUMBER,--falta esa maestra
+      p_sclient      CHAR,
+      p_schassis     CHAR,
+      p_sregist      CHAR,
+      p_dcompdate    DATE,
+      p_nyear        NUMBER,
+      p_nidclase     NUMBER,--falta esa maestra
+      p_niduso       NUMBER,--falta esa maestra
+      p_nvehmodel    NUMBER,
+      p_nseatcount   NUMBER 
+   );
+   
+   PROCEDURE UPD_AUTO
+   (
+    P_NPOLICY      NUMBER,
+    P_sregist      CHAR,
+    P_nvehmodel    NUMBER,
+    P_nseatcount   NUMBER
+   );
+   
+   --CRUD MARCA
+    FUNCTION SEL_MARCA
+   (
+    P_MARCA        VARCHAR
+   )
+   RETURN NUMBER;
+   --CRUD MODEL
+   FUNCTION SEL_MODEL
+   (
+    P_MODELO        VARCHAR,
+    P_NVEHBRAND     NUMBER
+   )
+   RETURN NUMBER;
+   
+   --REGISTRAR POLIZA
+   PROCEDURE REGISTRAR_POLIZA
+   (
+    --POLICY
+    P_NPOLICY      NUMBER,
+    P_dstartdate   DATE,
+    P_npremium     NUMBER,
+    --CLIENT
+    P_DOCUMENTO    CHAR,
+    P_sfirstname   CHAR,
+    P_slastname    CHAR,
+    P_slastname2   CHAR,
+    P_slegalname   VARCHAR2,
+    P_ddeathdat    DATE,
+    --ADDRESS
+    P_sstreet      CHAR,
+    --AUTO
+    P_sregist      CHAR,
+    P_nvehBRAND    VARCHAR,
+    P_nvehmodel    VARCHAR,
+    P_nseatcount   NUMBER,
+    --PHONES
+    P_sphone       CHAR,
+    P_mensaje 		OUT VARCHAR2
+   );
+   
+   --MODIFICAR POLIZA
+   PROCEDURE MODIFICAR_POLIZA
+   (
+    --POLICY
+    P_NPOLICY      NUMBER,
+    P_dstartdate   DATE,
+    --CLIENT
+    P_DOCUMENTO    CHAR,
+    P_sfirstname   CHAR,
+    P_slastname    CHAR,
+    P_slastname2   CHAR,
+    P_slegalname   VARCHAR2,
+    P_ddeathdat    DATE,
+    --ADDRESS
+    P_sstreet      CHAR,
+    --AUTO
+    P_sregist      CHAR,
+    P_nvehBRAND    VARCHAR,
+    P_nvehmodel    VARCHAR,
+    P_nseatcount   NUMBER,
+    --PHONES
+    P_sphone       CHAR,
+    P_mensaje 		OUT VARCHAR2
+   );
+   
+   --ANULAR PÓLIZA
+   PROCEDURE ANULAR_POLIZA
+   (
+    P_npolicy       NUMBER,
+    P_FECHA         DATE,
+    P_mensaje 		OUT VARCHAR2
+   );
+   
+END PKG_SOAT; 

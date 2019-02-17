@@ -1,0 +1,192 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="F4D0C23B-FCF6-A863-3500-288C4ABCD5F7" schemaObject="06795D3D-E570-7EDF-F596-F2C206CF6375" name="POLICY">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>POLICY</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="NPOLICY" id="C707F4CE-CDDD-4C87-8EBF-82E66BC359D1">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>NPOLICY</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>10</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,10,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SCLIENT" id="371633CF-EA60-6627-4431-EF9A57C4CDAE">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>SCLIENT</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>14 BYTE</dataTypeSize>
+<ownDataTypeParameters>14 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="5564DA28-669C-9FC6-CDA5-7AB6CF0393EA" referredColumn="9AFCA957-CCE4-FF28-236A-D858B1A10D26"/>
+</associations>
+</Column>
+<Column name="DCHANGDAT" id="64EF0044-8F29-A7AC-9342-414DCA7A5432">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>DCHANGDAT</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DCOMPDATE" id="BCFEFE1D-EFEA-1DD3-AC72-46144CCE795D">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>DCOMPDATE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DSTARTDATE" id="19CB75B9-21A8-EB1A-7920-506954AACFDA">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>DSTARTDATE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEXPIRDAT" id="D343158F-BF7F-207B-2849-C98D33F681F0">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>DEXPIRDAT</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DISSUEDAT" id="32B69255-03E5-F76E-B62D-545560310B4A">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>DISSUEDAT</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DNULLDATE" id="DB4D6191-47B3-E184-4777-997110E43386">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>DNULLDATE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NPREMIUM" id="55BB4FC3-9B7B-4526-18E6-DD196ED6D1F1">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>POLICY</sourceObjSchema>
+<sourceObjName>NPREMIUM</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>18</dataTypePrecision>
+<dataTypeScale>6</dataTypeScale>
+<ownDataTypeParameters>,18,6</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="7EC1BC5A-6E2B-FBCD-3D9A-D3D9C34412AE" name="POLICY_PK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>POLICY_PK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C707F4CE-CDDD-4C87-8EBF-82E66BC359D1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="549A12BC-B109-9068-548D-0BF4865F74E1" schemaObject="06795D3D-E570-7EDF-F596-F2C206CF6375" name="POLICY_PK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>POLICY_PK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C707F4CE-CDDD-4C87-8EBF-82E66BC359D1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="CA0731EE-EED8-0890-8034-A83E2D55DEF3" name="POL_CLIENT_FK">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="371633CF-EA60-6627-4431-EF9A57C4CDAE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

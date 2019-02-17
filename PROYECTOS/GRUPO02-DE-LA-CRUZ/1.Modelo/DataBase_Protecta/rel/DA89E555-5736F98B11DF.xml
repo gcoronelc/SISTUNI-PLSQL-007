@@ -1,0 +1,15 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<relationalModel class="oracle.dbtools.crest.model.design.relational.RelationalDesign" name="localhost" id="DA89E555-FB3A-34EC-DBCC-5736F98B11DF" mainViewID="768209CD-2DE3-0E79-8DF4-3A82B1CC7EB2">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:35 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+<selectedRDBMSSite>32076570-2523-435C-2E92-BF29817DFF70</selectedRDBMSSite>
+<importConnectionStamps>
+<importConnectionStamp class="oracle.dbtools.crest.imports.DBConnectionStamp">
+<connName>localhost</connName>
+<connUser>protecta</connUser>
+<connType>1</connType>
+</importConnectionStamp>
+</importConnectionStamps>
+</relationalModel>

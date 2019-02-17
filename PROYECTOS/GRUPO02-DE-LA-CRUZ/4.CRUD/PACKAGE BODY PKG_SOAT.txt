@@ -1,0 +1,432 @@
+CREATE OR REPLACE PACKAGE BODY PKG_SOAT AS 
+   --CRUD POLICY
+   PROCEDURE INS_POLICY
+   (
+    P_npolicy       NUMBER,
+    P_sclient       CHAR,
+    P_dchangdat     DATE,
+    P_dcompdate     DATE,
+    P_dstartdate    DATE,
+    P_dexpirdat     DATE,
+    P_dissuedat     DATE,
+    P_dnulldate     DATE,
+    P_npremium      NUMBER
+   ) 
+   IS
+   BEGIN
+    INSERT INTO POLICY (NPOLICY,SCLIENT,DCHANGDAT,DCOMPDATE,DSTARTDATE,DEXPIRDAT,DISSUEDAT,DNULLDATE,NPREMIUM)
+    VALUES
+    (P_NPOLICY,P_SCLIENT,P_DCHANGDAT,P_DCOMPDATE,P_DSTARTDATE,P_DEXPIRDAT,P_DISSUEDAT,P_DNULLDATE,P_NPREMIUM);
+   END;
+   
+   PROCEDURE SEL_POLICY
+   (
+    P_npolicy       NUMBER,
+    P_mensaje		OUT VARCHAR2,
+    P_reg			OUT SYS_REFCURSOR
+   )
+   IS
+    V_COUNT         NUMBER;
+    V_NPOLICY       NUMBER;
+    V_NPREMIUM      NUMBER;
+    V_dstartdate    DATE;
+    V_dexpirdat     DATE;
+    V_SCLIENAME     VARCHAR(100);
+    V_SREGIST       VARCHAR(20);
+    V_SDESCRIPT_B   VARCHAR(100);
+    V_SDESCRIPT_M   VARCHAR(100);
+   BEGIN
+   P_mensaje := '';
+    SELECT COUNT(1) INTO V_COUNT FROM POLICY P WHERE P.NPOLICY = P_NPOLICY;
+    
+    IF (V_COUNT > 0) THEN
+        open P_reg for
+        SELECT P.NPOLICY, P.NPREMIUM, P.dstartdate, p.dexpirdat,C.SCLIENAME ,A.SREGIST , PBA.SDESCRIPT , PMA.SDESCRIPT
+               INTO
+               V_NPOLICY, V_NPREMIUM, V_dstartdate, V_dexpirdat, V_SCLIENAME, V_SREGIST, V_SDESCRIPT_B, V_SDESCRIPT_M
+        FROM POLICY P, CLIENT C, AUTO A, PV_MODEL_AUTO PMA, PV_BRAND_AUTO PBA
+        WHERE P.NPOLICY = P_NPOLICY
+          AND P.SCLIENT = C.SCLIENT
+          AND P.NPOLICY = A.NPOLICY
+          AND A.NVEHMODEL = PMA.NVEHMODEL
+          AND PMA.nvehbrand = PBA.nvehbrand;
+    ELSE
+        P_mensaje := 'PÓLIZA NO ENCONTRADA.';
+    END IF;
+    
+   END;
+   
+   PROCEDURE UPD_POLICY
+   (
+    P_NPOLICY      NUMBER,
+    P_dstartdate   DATE
+   ) 
+    IS
+    BEGIN
+        UPDATE POLICY P 
+           SET P.dstartdate = P_dstartdate, p.dexpirdat = add_months( P_dstartdate, 12 ), DCHANGDAT = SYSDATE
+         WHERE P.NPOLICY = P_NPOLICY;
+    END;
+    
+   --CRUD CLIENT
+   PROCEDURE INS_CLIENT
+   (
+      P_sclient      CHAR,
+      P_dbirthdat    DATE,
+      P_scliename    CHAR,
+      P_sfirstname   CHAR,
+      P_slastname    CHAR,
+      P_slastname2   CHAR,
+      P_slegalname   VARCHAR2,
+      P_dcompdate    DATE,
+      P_ddeathdat    DATE,
+      P_slicense     CHAR,
+      P_ssexclien    CHAR,
+      P_nperson_typ  NUMBER
+   )
+   IS
+   BEGIN
+    INSERT INTO CLIENT (SCLIENT,DBIRTHDAT,SCLIENAME,SFIRSTNAME,SLASTNAME,SLASTNAME2,SLEGALNAME,DCOMPDATE,DDEATHDAT,SLICENSE,SSEXCLIEN,NPERSON_TYP)
+    VALUES
+    (P_SCLIENT,P_DBIRTHDAT,TRIM(P_SCLIENAME),TRIM(P_SFIRSTNAME),TRIM(P_SLASTNAME),TRIM(P_SLASTNAME2),TRIM(P_SLEGALNAME),P_DCOMPDATE,P_DDEATHDAT,P_SLICENSE,P_SSEXCLIEN,P_NPERSON_TYP);
+   END;
+   
+   PROCEDURE SEL_CLIENT
+   (
+    P_document       NUMBER,
+    P_mensaje		OUT VARCHAR2,
+    P_reg			OUT SYS_REFCURSOR
+   )
+   IS
+    V_COUNT         NUMBER;
+    V_SCLIENAME     VARCHAR(100);
+    V_SSTREET       VARCHAR(100);
+   BEGIN
+   P_mensaje:= '';
+    SELECT COUNT(1) INTO V_COUNT FROM CLIENT C WHERE C.SCLIENT LIKE '%'||P_document||'%';
+    
+    IF (V_COUNT > 0) THEN
+    	open P_reg for
+        SELECT C.SCLIENAME ,A.SSTREET
+               INTO
+               V_SCLIENAME, V_SSTREET
+        FROM CLIENT C, ADDRESS A
+        WHERE C.SCLIENT LIKE '%'||P_document||'%'
+          AND C.SCLIENT = A.SCLIENT;
+        
+        
+    ELSE
+        P_mensaje :='CLIENTE NO ENCONTRADO.';
+    END IF;
+    
+   END;
+   
+   PROCEDURE UPD_CLIENT
+   (
+    P_DOCUMENTO    CHAR,
+    P_sfirstname   CHAR,
+    P_slastname    CHAR,
+    P_slastname2   CHAR,
+    P_slegalname   VARCHAR2,
+    P_ddeathdat    DATE
+   )
+   IS
+   BEGIN
+    UPDATE CLIENT C
+       SET C.sfirstname = P_sfirstname,
+           C.slastname = P_slastname,
+           C.slastname2 = P_slastname2,
+           C.slegalname = P_slegalname,
+           C.ddeathdat = P_ddeathdat
+    WHERE C.SCLIENT LIKE '%%'||P_DOCUMENTO||'';
+   END;
+
+   --CRUD ADDRESS
+   PROCEDURE INS_ADDRESS
+   (
+      P_skeyaddress   CHAR,
+      P_sstreet       CHAR,
+      P_sstreet1      CHAR,
+      P_sclient       CHAR,
+      P_se_mail       CHAR,
+      P_dcompdate     DATE,
+      P_nprovince     NUMBER,--falta maestra
+      P_nlocal        NUMBER,--falta maestra
+      P_nmunicipality NUMBER,--falta maestra
+      P_sdescadd      CHAR,
+      P_sreference    VARCHAR2
+   )
+   IS
+   BEGIN
+    INSERT INTO ADDRESS (SKEYADDRESS,SSTREET,SSTREET1,SCLIENT,SE_MAIL,DCOMPDATE,NPROVINCE,NLOCAL,NMUNICIPALITY,SDESCADD,SREFERENCE)
+    VALUES
+    (P_SKEYADDRESS,P_SSTREET,P_SSTREET1,P_SCLIENT,P_SE_MAIL,P_DCOMPDATE,P_NPROVINCE,P_NLOCAL,P_NMUNICIPALITY,P_SDESCADD,P_SREFERENCE);
+   END;
+   
+   PROCEDURE UPD_ADDRESS
+   (
+    P_DOCUMENTO    CHAR,
+    P_sstreet      CHAR
+   )
+   IS
+   BEGIN
+    UPDATE ADDRESS A
+       SET A.sstreet = P_sstreet
+    WHERE A.SCLIENT LIKE '%'||P_DOCUMENTO||'%';
+   END;
+   
+   --CRUD PHONES
+   PROCEDURE INS_PHONES
+   (
+      p_skeyaddress     CHAR,
+      p_sphone          CHAR,
+      p_dcompdate       DATE 
+   )
+   IS
+   BEGIN
+    INSERT INTO PHONES (SKEYADDRESS,SPHONE,DCOMPDATE)
+    VALUES
+    (p_SKEYADDRESS,p_SPHONE,p_DCOMPDATE);
+   END; 
+   
+   PROCEDURE UPD_PHONES
+   (
+    P_DOCUMENTO    CHAR,
+    P_sphone       CHAR
+   )
+   IS
+   BEGIN
+    UPDATE PHONES P
+       SET P.SPHONE = P_SPHONE
+     WHERE P.SKEYADDRESS LIKE '%'||P_DOCUMENTO||'%';
+   END;
+   
+   --CRUD AUTO
+   PROCEDURE INS_AUTO
+   (
+      p_npolicy      NUMBER,
+      p_nautozone    NUMBER,--falta esa maestra
+      p_sclient      CHAR,
+      p_schassis     CHAR,
+      p_sregist      CHAR,
+      p_dcompdate    DATE,
+      p_nyear        NUMBER,
+      p_nidclase     NUMBER,--falta esa maestra
+      p_niduso       NUMBER,--falta esa maestra
+      p_nvehmodel    NUMBER,
+      p_nseatcount   NUMBER 
+   )
+   IS
+   BEGIN
+    INSERT INTO AUTO (NPOLICY,NAUTOZONE,SCLIENT,SCHASSIS,SREGIST,DCOMPDATE,NYEAR,NIDCLASE,NIDUSO,NVEHMODEL,NSEATCOUNT)
+    VALUES
+    (p_NPOLICY,p_NAUTOZONE,p_SCLIENT,p_SCHASSIS,p_SREGIST,p_DCOMPDATE,p_NYEAR,p_NIDCLASE,p_NIDUSO,p_NVEHMODEL,p_NSEATCOUNT);
+   END;  
+   
+   PROCEDURE UPD_AUTO
+   (
+    P_NPOLICY      NUMBER,
+    P_sregist      CHAR,
+    P_nvehmodel    NUMBER,
+    P_nseatcount   NUMBER
+   )
+   IS
+   BEGIN
+    UPDATE AUTO A
+       SET A.SREGIST = P_sregist, A.nvehmodel = P_nvehmodel, A.nseatcount = P_nseatcount
+     WHERE A.NPOLICY = P_NPOLICY;
+   END;
+   
+   --CRUD MARCA
+   FUNCTION SEL_MARCA
+   (
+    P_MARCA        VARCHAR
+   )
+   RETURN NUMBER
+   IS
+    V_COUNT NUMBER;
+    V_NVEHBRAND NUMBER:=0;
+   BEGIN
+    SELECT COUNT(1) INTO V_COUNT FROM pv_BRAND_auto PBA
+     WHERE UPPER(PBA.SDESCRIPT) LIKE '%'||P_MARCA||'%';
+    
+    IF (V_COUNT <> 0) THEN
+        SELECT PBA.NVEHBRAND INTO V_NVEHBRAND
+          FROM pv_BRAND_auto PBA
+         WHERE UPPER(PBA.SDESCRIPT) LIKE '%'||P_MARCA||'%'
+       	AND ROWNUM = 1;
+    END IF;
+    
+    RETURN V_NVEHBRAND;
+   END; 
+    
+   --CRUD MODEL
+   FUNCTION SEL_MODEL
+   (
+    P_MODELO        VARCHAR,
+    P_NVEHBRAND     NUMBER
+   )
+   RETURN NUMBER
+   IS
+    V_COUNT NUMBER;
+    V_NVEHMODEL NUMBER;
+   BEGIN
+    SELECT COUNT(1) INTO V_COUNT FROM pv_model_auto PMA
+     WHERE PMA.NVEHBRAND = P_NVEHBRAND
+       AND UPPER(PMA.SDESCRIPT) LIKE '%'||P_MODELO||'%'
+       AND ROWNUM = 1;
+    
+    IF (V_COUNT <> 0) THEN
+        SELECT PMA.NVEHMODEL INTO V_NVEHMODEL
+          FROM pv_model_auto PMA
+         WHERE PMA.NVEHBRAND = P_NVEHBRAND
+           AND UPPER(PMA.SDESCRIPT) LIKE '%'||P_MODELO||'%';
+    END IF;
+    
+    RETURN V_NVEHMODEL;
+   END;
+   
+   --REGISTRAR POLIZA
+   PROCEDURE REGISTRAR_POLIZA
+   (
+    --POLICY
+    P_NPOLICY      NUMBER,
+    P_dstartdate   DATE,
+    P_npremium     NUMBER,
+    --CLIENT
+    P_DOCUMENTO    CHAR,
+    P_sfirstname   CHAR,
+    P_slastname    CHAR,
+    P_slastname2   CHAR,
+    P_slegalname   VARCHAR2,
+    P_ddeathdat    DATE,
+    --ADDRESS
+    P_sstreet      CHAR,
+    --AUTO
+    P_sregist      CHAR,
+    P_nvehBRAND    VARCHAR,
+    P_nvehmodel    VARCHAR,
+    P_nseatcount   NUMBER,
+    --PHONES
+    P_sphone       CHAR,
+    P_mensaje 		OUT VARCHAR2
+   )
+   IS
+    V_COUNT  NUMBER(10,2);
+    V_MARCA  NUMBER(10,2):=0;
+    V_MODELO NUMBER(10,2):=0;
+    V_sclient VARCHAR(100);
+   BEGIN
+   	P_mensaje := '';
+   	
+    SELECT COUNT(1) INTO V_COUNT FROM POLICY P WHERE P.NPOLICY = P_NPOLICY;
+    IF (V_COUNT <> 0) THEN
+        P_mensaje := 'PÓLIZA ENCONTRADA.';
+    ELSE
+        SELECT PKG_SOAT.SEL_MARCA(P_nvehBRAND) INTO V_MARCA FROM DUAL;
+        IF (V_MARCA = 0) THEN
+            P_mensaje := 'MARCA NO ENCONTRADO.';
+        ELSE
+            SELECT PKG_SOAT.SEL_MODEL(P_nvehmodel, V_MARCA) INTO V_MODELO FROM DUAL;
+            IF (V_MODELO = 0) THEN
+            	P_mensaje := 'MODELO NO ENCONTRADO.';
+            ELSE
+                SELECT COUNT(1) INTO V_COUNT FROM CLIENT C WHERE C.SCLIENT LIKE '%'||P_DOCUMENTO||'%';
+                SELECT LPAD(P_DOCUMENTO,14,'0') INTO V_sclient FROM DUAL;
+                IF (V_COUNT = 0) THEN
+                    PKG_SOAT.INS_CLIENT(V_sclient,NULL,V_sclient,P_sfirstname,P_slastname,P_slastname2,P_slegalname,SYSDATE,NULL,NULL,NULL,NULL);
+                    PKG_SOAT.INS_ADDRESS('0'||V_sclient,P_sstreet,NULL,V_sclient,NULL,SYSDATE,NULL,NULL,NULL,NULL,NULL);
+                    PKG_SOAT.INS_PHONES('0'||V_sclient,p_sphone,SYSDATE);
+                ELSE
+                    SELECT C.SCLIENT INTO V_sclient FROM CLIENT C WHERE C.SCLIENT LIKE '%'||P_DOCUMENTO||'%';
+                END IF;
+                PKG_SOAT.INS_POLICY(P_npolicy,V_sclient,NULL,SYSDATE,P_dstartdate,add_months( P_dstartdate, 12 ),SYSDATE,NULL,P_npremium);
+                PKG_SOAT.INS_AUTO(p_npolicy,0,V_sclient,NULL,p_sregist,SYSDATE,2000,0,0,V_MODELO,p_nseatcount);  
+                COMMIT;                  
+                P_mensaje := 'SE REGISTRÓ LA PÓLIZA: '||P_npolicy;
+            END IF;
+        END IF;
+    END IF;
+   END;
+   
+   --MODIFICAR POLIZA
+   PROCEDURE MODIFICAR_POLIZA
+   (
+    --POLICY
+    P_NPOLICY      NUMBER,
+    P_dstartdate   DATE,
+    --CLIENT
+    P_DOCUMENTO    CHAR,
+    P_sfirstname   CHAR,
+    P_slastname    CHAR,
+    P_slastname2   CHAR,
+    P_slegalname   VARCHAR2,
+    P_ddeathdat    DATE,
+    --ADDRESS
+    P_sstreet      CHAR,
+    --AUTO
+    P_sregist      CHAR,
+    P_nvehBRAND    VARCHAR,
+    P_nvehmodel    VARCHAR,
+    P_nseatcount   NUMBER,
+    --PHONES
+    P_sphone       CHAR,
+    P_mensaje 		OUT VARCHAR2
+   )
+   IS
+    V_COUNT  NUMBER;
+    V_MARCA  NUMBER:=0;
+    V_MODELO NUMBER:=0;
+   BEGIN
+   	P_mensaje := '';
+    SELECT COUNT(1) INTO V_COUNT FROM POLICY P WHERE P.NPOLICY = P_NPOLICY;
+    IF (V_COUNT = 0) THEN
+    	P_mensaje := 'PÓLIZA NO ENCONTRADA.';
+    ELSE
+        SELECT COUNT(1) INTO V_COUNT FROM CLIENT P WHERE P.SCLIENT LIKE '%'||P_DOCUMENTO||'%';
+        IF (V_COUNT = 0) THEN
+            P_mensaje := 'CLIENTE NO ENCONTRADO.';
+        ELSE
+            SELECT PKG_SOAT.SEL_MARCA(P_nvehBRAND) INTO V_MARCA FROM DUAL;
+            IF (V_MARCA = 0) THEN
+                P_mensaje := 'MARCA NO ENCONTRADO.';
+            ELSE
+                SELECT PKG_SOAT.SEL_MODEL(P_nvehmodel, V_MARCA) INTO V_MODELO FROM DUAL;
+                IF (V_MODELO = 0) THEN
+                    P_mensaje := 'MARCA NO ENCONTRADO.';
+                ELSE
+                    PKG_SOAT.UPD_POLICY(P_NPOLICY,P_dstartdate);
+                    PKG_SOAT.UPD_CLIENT(P_DOCUMENTO,P_sfirstname,P_slastname,P_slastname2,P_slegalname,P_ddeathdat);
+                    PKG_SOAT.UPD_ADDRESS(P_DOCUMENTO,P_sstreet);
+                    PKG_SOAT.UPD_AUTO(P_NPOLICY,P_sregist,V_MODELO,P_nseatcount);
+                    PKG_SOAT.UPD_PHONES(P_DOCUMENTO,P_sphone);
+                    COMMIT;
+                    P_mensaje := 'SE ACTUALIZÓ LA PÓLIZA: '||P_npolicy;
+                END IF;
+            END IF;
+        END IF;
+    END IF;
+   END;
+   
+   --ANULAR PÓLIZA
+   PROCEDURE ANULAR_POLIZA
+   (
+    P_npolicy       NUMBER,
+    P_FECHA         DATE,
+    P_mensaje 		OUT VARCHAR2
+   )
+   IS
+    V_COUNT NUMBER;
+   BEGIN
+   P_mensaje := '';
+    SELECT COUNT(1) INTO V_COUNT FROM POLICY P WHERE P.NPOLICY = P_NPOLICY;
+    IF (V_COUNT = 0) THEN
+        P_mensaje := 'PÓLIZA NO ENCONTRADA.';
+    ELSE
+        UPDATE POLICY P SET P.DNULLDATE = P_FECHA WHERE P.NPOLICY = P_npolicy;
+        COMMIT;
+        P_mensaje := 'SE ANULÓ LA PÓLIZA: '||P_npolicy;
+    END IF;
+   END;
+   
+END PKG_SOAT; 

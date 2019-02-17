@@ -1,0 +1,146 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="785D3B7E-55EB-5AAC-9300-60EFB205F777" schemaObject="06795D3D-E570-7EDF-F596-F2C206CF6375" name="PV_MODEL_AUTO">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>PV_MODEL_AUTO</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="NVEHBRAND" id="28A91AA8-D76C-93DF-8927-364EDD2B3DAB">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PV_MODEL_AUTO</sourceObjSchema>
+<sourceObjName>NVEHBRAND</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,5,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="049309EB-8DDA-7516-7BB3-7A0C2349B932" referredColumn="5AFE8ED7-DA37-427C-707B-0EF6738A4FBA"/>
+</associations>
+</Column>
+<Column name="NVEHMODEL" id="9E165487-E69E-78C9-4F9E-9FA6B645304D">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PV_MODEL_AUTO</sourceObjSchema>
+<sourceObjName>NVEHMODEL</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<dataTypePrecision>5</dataTypePrecision>
+<dataTypeScale>0</dataTypeScale>
+<ownDataTypeParameters>,5,0</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SDESCRIPT" id="F38ACDDF-3F3D-6909-014D-2ED01D36898D">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PV_MODEL_AUTO</sourceObjSchema>
+<sourceObjName>SDESCRIPT</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<dataTypeSize>50 BYTE</dataTypeSize>
+<ownDataTypeParameters>50 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DEFFECDATE" id="B59CA39A-F823-E21A-B0F8-7592725223A9">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PV_MODEL_AUTO</sourceObjSchema>
+<sourceObjName>DEFFECDATE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="SSTATREGT" id="55E1E6C1-C57D-560F-33CE-A71EA90EC3E8">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PV_MODEL_AUTO</sourceObjSchema>
+<sourceObjName>SSTATREGT</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>1 BYTE</dataTypeSize>
+<ownDataTypeParameters>1 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DCOMPDATE" id="D618433C-B09F-883C-DECC-F13CDF57A873">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PV_MODEL_AUTO</sourceObjSchema>
+<sourceObjName>DCOMPDATE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="EEAFE23E-17A8-16D7-95BB-3C4189F334F3" name="PV_MODEL_AUTO_PK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>PV_MODEL_AUTO_PK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9E165487-E69E-78C9-4F9E-9FA6B645304D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B6AEEDEE-D090-6121-8A14-6C51CD915D37" schemaObject="06795D3D-E570-7EDF-F596-F2C206CF6375" name="PV_MODEL_AUTO_PK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>PV_MODEL_AUTO_PK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<indexState>Unique Plain Index</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9E165487-E69E-78C9-4F9E-9FA6B645304D"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="91E1106E-6957-FC25-3998-35EF5F5E8197" name="PV_BRAND_AUTO_FK">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="28A91AA8-D76C-93DF-8927-364EDD2B3DAB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,72 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="8BCE3398-18CE-D987-48B9-289E69A954D8" schemaObject="06795D3D-E570-7EDF-F596-F2C206CF6375" name="PHONES">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>PHONES</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="SKEYADDRESS" id="EAEC6C83-EF09-F2F7-168D-CAE2DF5E8C26">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PHONES</sourceObjSchema>
+<sourceObjName>SKEYADDRESS</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>50 BYTE</dataTypeSize>
+<ownDataTypeParameters>50 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="ED79C692-B908-8BFF-013D-A313850E7D8F" referredColumn="53EDBFA4-6E71-EAD0-430F-1B6C9A029889"/>
+</associations>
+</Column>
+<Column name="SPHONE" id="74B342A1-F31A-4DAC-44A2-E8CA469D6B38">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PHONES</sourceObjSchema>
+<sourceObjName>SPHONE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT025</logicalDatatype>
+<dataTypeSize>11 BYTE</dataTypeSize>
+<ownDataTypeParameters>11 BYTE,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="DCOMPDATE" id="924311FD-9DAF-98C8-D66E-51F68645B558">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PHONES</sourceObjSchema>
+<sourceObjName>DCOMPDATE</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<useDomainConstraints>false</useDomainConstraints>
+<use>1</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<dataTypeSize>7</dataTypeSize>
+<ownDataTypeParameters>7,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="7A1C8C87-BA00-DCC1-1FE5-2B0374BC0F1F" name="PHONES_FK">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="EAEC6C83-EF09-F2F7-168D-CAE2DF5E8C26"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

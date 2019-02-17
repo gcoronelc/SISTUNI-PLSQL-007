@@ -1,0 +1,3 @@
+begin
+    PROTECTA.prd_muestra_reporte(7000000321);
+end;

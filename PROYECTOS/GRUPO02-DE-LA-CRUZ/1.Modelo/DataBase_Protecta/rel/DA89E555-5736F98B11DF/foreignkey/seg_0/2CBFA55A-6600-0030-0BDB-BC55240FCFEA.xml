@@ -1,0 +1,19 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="2CBFA55A-6600-0030-0BDB-BC55240FCFEA" containerWithKeyObject="9A3C927D-21DE-2AA2-8AA9-CB085966F6B9" localFKIndex="D576ECDB-28AF-7681-C349-93ABDA91F298" name="PV_MODEL_AUTO_FK">
+<sourceConnName>localhost</sourceConnName>
+<sourceObjSchema>PROTECTA</sourceObjSchema>
+<sourceObjName>PV_MODEL_AUTO_FK</sourceObjName>
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<referredTableLongName>PROTECTA.PV_MODEL_AUTO</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>785D3B7E-55EB-5AAC-9300-60EFB205F777</referredTableID>
+<keyObject>EEAFE23E-17A8-16D7-95BB-3C4189F334F3</keyObject>
+<referredKeyID>EEAFE23E-17A8-16D7-95BB-3C4189F334F3</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>NVEHMODEL</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,91 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="POLICY" directorySegmentName="seg_0" id="F4D0C23B-FCF6-A863-3500-288C4ABCD5F7">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>8BC85ACE-242E-B435-414E-13CB1AF84EF3</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="DSTARTDATE" id="19CB75B9-21A8-EB1A-7920-506954AACFDA">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DISSUEDAT" id="32B69255-03E5-F76E-B62D-545560310B4A">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCLIENT" id="371633CF-EA60-6627-4431-EF9A57C4CDAE">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NPREMIUM" id="55BB4FC3-9B7B-4526-18E6-DD196ED6D1F1">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DCHANGDAT" id="64EF0044-8F29-A7AC-9342-414DCA7A5432">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DCOMPDATE" id="BCFEFE1D-EFEA-1DD3-AC72-46144CCE795D">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NPOLICY" id="C707F4CE-CDDD-4C87-8EBF-82E66BC359D1">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DEXPIRDAT" id="D343158F-BF7F-207B-2849-C98D33F681F0">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DNULLDATE" id="DB4D6191-47B3-E184-4777-997110E43386">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="POLICY_PK" id="549A12BC-B109-9068-548D-0BF4865F74E1">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="POL_CLIENT_FK" id="CA0731EE-EED8-0890-8034-A83E2D55DEF3">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="POLICY_PK" id="7EC1BC5A-6E2B-FBCD-3D9A-D3D9C34412AE">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<existingIndex>549A12BC-B109-9068-548D-0BF4865F74E1</existingIndex>
+<indexSegment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

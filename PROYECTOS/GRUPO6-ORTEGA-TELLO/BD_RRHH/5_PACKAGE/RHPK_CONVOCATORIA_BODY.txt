@@ -1,0 +1,3590 @@
+create or replace package body RHPK_CONVOCATORIAS is
+
+----------------------------------------------------------------------------------------------------
+-- Autor          :
+-- Descripción    : Funcion que inserta un registro en la tabla contenido del medio portador
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_ESPECIALIDAD(p_vIN_DESCRIP_ESPECIALIDAD IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_ESPECIALIDAD  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+             v_nNU_COUNT NUMBER := 0;
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            --SELECT IDO_RRHH.SEQ_ESPECIALIDAD.NEXTVAL
+            SELECT SEQ_ESPECIALIDAD.NEXTVAL
+            INTO   v_nNU_ESPECIALIDAD
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            --FROM   IDO_RRHH.RHTM_ESPECIALIDAD;
+            FROM   RHTM_ESPECIALIDAD;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            --FROM IDO_RRHH.RHTM_ESPECIALIDAD
+            FROM RHTM_ESPECIALIDAD
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+            SELECT COUNT(1)
+            INTO v_nNU_COUNT
+            FROM RHTM_ESPECIALIDAD 
+            WHERE de_especialidad =  p_vIN_DESCRIP_ESPECIALIDAD;
+
+            IF v_nNU_COUNT = 0 THEN
+            --INSERT INTO IDO_RRHH.RHTM_ESPECIALIDAD (CO_ESPECIALIDAD,
+            INSERT INTO RHTM_ESPECIALIDAD (CO_ESPECIALIDAD,
+                                           DE_ESPECIALIDAD,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_ESPECIALIDAD,
+                                                      p_vIN_DESCRIP_ESPECIALIDAD,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+            
+             ELSE v_vOUT_VALORES := 'YA EXISTE LA ESPECIALIDAD ';
+            END IF;                                         
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            --FROM   IDO_RRHH.RHTM_ESPECIALIDAD A
+            FROM   RHTM_ESPECIALIDAD A
+            WHERE A.CO_ESPECIALIDAD=v_nNU_ESPECIALIDAD;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            --FROM   IDO_RRHH.RHTM_ESPECIALIDAD A
+             FROM   RHTM_ESPECIALIDAD A
+            WHERE  A.CO_ESPECIALIDAD=v_nNU_ESPECIALIDAD;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= 'YA EXISTE LA ESPECIALIDAD';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          :
+-- Descripción    : Procedure que lista los registros de la tabla contenido del medio portador
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_ESPECIALIDAD(p_cIN_ESP IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_ESPECIALIDAD AS COD_ESP,
+                   A.DE_ESPECIALIDAD AS DESCRIP_ESP,
+                   A.NU_SECUENCIA AS SEC_ESP,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO,
+                   ROWNUM AS FILA
+          FROM     --IDO_RRHH.RHTM_ESPECIALIDAD A WHERE A.IN_ESTADO=p_cIN_ESP
+                   RHTM_ESPECIALIDAD A WHERE A.IN_ESTADO=p_cIN_ESP
+          ORDER BY A.CO_ESPECIALIDAD ASC;
+     END;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          :
+-- Descripción    : Procedure que busca un registro de la tabla contenido del medio portador por su
+--                  codigo primario
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_ESPECIALIDAD(p_nIN_COD_ESP IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          --FROM   IDO_RRHH.RHTM_ESPECIALIDAD A
+          FROM   RHTM_ESPECIALIDAD A
+          WHERE  A.CO_ESPECIALIDAD=p_nIN_COD_ESP;
+     END;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          :
+-- Descripción    : Función que actualiza un registro de la tabla contenido del medio portador
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_ESPECIALIDAD(p_nIN_COD_ESP IN  INTEGER,
+                                p_vIN_DE_ESPECIALIDAD IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          --UPDATE IDO_RRHH.RHTM_ESPECIALIDAD
+          UPDATE RHTM_ESPECIALIDAD
+          SET    DE_ESPECIALIDAD = p_vIN_DE_ESPECIALIDAD,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_ESPECIALIDAD=p_nIN_COD_ESP;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          :
+-- Descripción    : Función que elimina logicamente un registro de la tabla contenido del medio portador
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_ESPECIALIDAD(p_nIN_COD_ESP IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          --UPDATE IDO_RRHH.RHTM_ESPECIALIDAD
+          UPDATE RHTM_ESPECIALIDAD
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_ESPECIALIDAD=p_nIN_COD_ESP;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+
+FUNCTION  SFFU_INSR_NIVEL_ESTUDIOS(p_vIN_DESCRIP_NIVEL_ESTUDIOS IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_NIVEL_ESTUDIOS  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_NIVEL_ESTUDIOS.NEXTVAL
+            INTO   v_nNU_NIVEL_ESTUDIOS
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            FROM   IDO_RRHH.RHTM_NIVEL_ESTUDIOS;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            FROM IDO_RRHH.RHTM_NIVEL_ESTUDIOS
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+
+            INSERT INTO IDO_RRHH.RHTM_NIVEL_ESTUDIOS (CO_NIVEL,
+                                           DE_NIVEL,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_NIVEL_ESTUDIOS,
+                                                      p_vIN_DESCRIP_NIVEL_ESTUDIOS,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            FROM   IDO_RRHH.RHTM_NIVEL_ESTUDIOS A
+            WHERE A.CO_NIVEL=v_nNU_NIVEL_ESTUDIOS;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            FROM   IDO_RRHH.RHTM_NIVEL_ESTUDIOS A
+            WHERE  A.CO_NIVEL=v_nNU_NIVEL_ESTUDIOS;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_NIVEL_ESTUDIOS(p_cIN_NEST IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_NIVEL AS COD_NEST,
+                   A.DE_NIVEL AS DESCRIP_NEST,
+                   A.NU_SECUENCIA AS SEC_ESP,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO,
+                   ROWNUM AS FILA
+          FROM     IDO_RRHH.RHTM_NIVEL_ESTUDIOS A WHERE A.IN_ESTADO=p_cIN_NEST
+          ORDER BY A.CO_NIVEL ASC;
+     END;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_NIVEL_ESTUDIOS(p_nIN_COD_NEST IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          FROM   IDO_RRHH.RHTM_NIVEL_ESTUDIOS A
+          WHERE  A.CO_NIVEL=p_nIN_COD_NEST;
+     END;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_NIVEL_ESTUDIOS(p_nIN_COD_NEST IN  INTEGER,
+                                p_vIN_DE_NIVEL_ESTUDIOS IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_NIVEL_ESTUDIOS
+          SET    DE_NIVEL = p_vIN_DE_NIVEL_ESTUDIOS,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_NIVEL=p_nIN_COD_NEST;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_NIVEL_ESTUDIOS(p_nIN_COD_NEST IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_NIVEL_ESTUDIOS
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_NIVEL=p_nIN_COD_NEST;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+------------------------------------------------------------------------------------------
+---TIPO INSTITUCION ACADEMICA
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_TIPO_INST_ACAD(p_vIN_DESCRIP_INST_ACAD IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_TIPO_INST_ACAD  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_TIPO_INSTITUCION_ACAD.NEXTVAL
+            INTO   v_nNU_TIPO_INST_ACAD
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            FROM   IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            FROM IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+
+            INSERT INTO IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD (CO_TIPO_INST,
+                                           DE_TIPO_INST,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_TIPO_INST_ACAD,
+                                                      p_vIN_DESCRIP_INST_ACAD,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            FROM   IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD A
+            WHERE A.CO_TIPO_INST=v_nNU_TIPO_INST_ACAD;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            FROM   IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD A
+            WHERE  A.CO_TIPO_INST=v_nNU_TIPO_INST_ACAD;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_TIPO_INST_ACAD(p_cIN_TIA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_TIPO_INST AS COD_TIA,
+                   A.DE_TIPO_INST AS DESCRIP_TIA,
+                   A.NU_SECUENCIA AS SEC_ESP,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO,
+                   ROWNUM AS FILA
+          FROM     IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD A WHERE A.IN_ESTADO=p_cIN_TIA
+          ORDER BY A.CO_TIPO_INST ASC;
+     END;
+END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_TIPO_INST_ACAD(p_nIN_COD_TIA IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          FROM   IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD A
+          WHERE  A.CO_TIPO_INST=p_nIN_COD_TIA;
+     END;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_TIPO_INST_ACAD(p_nIN_COD_TIA IN  INTEGER,
+                                p_vIN_DE_TIPO_INST_ACAD IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD
+          SET    DE_TIPO_INST = p_vIN_DE_TIPO_INST_ACAD,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_TIPO_INST=p_nIN_COD_TIA;
+          --v_nNU_ERROR := 2;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_TIPO_INST_ACAD(p_nIN_COD_TIA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_TIPO_INST=p_nIN_COD_TIA;
+          --v_nNU_ERROR := 3;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+
+----METODOS PARA TRABAJAR NIVEL DE ESTUDIOS ALCANZADOS
+---metodo para enlistar combos:
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_COMBO_NIVEL_ESTUDIOS( p_crOUT_CURSOR_LISTA OUT SYS_REFCURSOR ) IS
+    Begin
+      Begin
+            OPEN p_crOUT_CURSOR_LISTA FOR
+   SELECT
+   A.CO_NIVEL AS CODIGO_NIVEL_ESTUDIOS,
+   A.DE_NIVEL AS DESCRIPCION_NIVEL_ESTUDIOS
+   FROM IDO_RRHH.RHTM_NIVEL_ESTUDIOS A
+   WHERE A.IN_ESTADO='1'
+   ORDER BY A.FE_CREACION DESC;
+   END;
+   END;
+
+   ----------------------------------------------------------------------------------------------------
+-- Autor          : Ricardo Gutiérrez
+-- Descripción    : Funcion que inserta un registro en la tabla contenido del medio portador
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_NIVEL_ALCANZADO(p_nIN_COD_NEST IN  INTEGER,
+                                 p_vIN_DE_NIVEL_ALCANZADO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_ALCANZADO  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_NIVEL_ALCANZADO.NEXTVAL
+            INTO   v_nNU_ALCANZADO
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            FROM   IDO_RRHH.RHTM_NIVEL_ALCANZADO;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            FROM IDO_RRHH.RHTM_NIVEL_ALCANZADO
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+
+            INSERT INTO IDO_RRHH.RHTM_NIVEL_ALCANZADO (CO_NIVEL_ALC,
+                                           DE_NIVEL_ALC,
+                                           CO_NIVEL,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_ALCANZADO,
+                                                      p_vIN_DE_NIVEL_ALCANZADO,
+                                                      p_nIN_COD_NEST,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            FROM   IDO_RRHH.RHTM_NIVEL_ALCANZADO A
+            WHERE A.CO_NIVEL_ALC=v_nNU_ALCANZADO;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            FROM   IDO_RRHH.RHTM_NIVEL_ALCANZADO A
+            WHERE  A.CO_NIVEL_ALC=v_nNU_ALCANZADO;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_NIVEL_ALCANZADO(p_cIN_NIVA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                   A.CO_NIVEL_ALC AS CO_NIVEL_ALC,
+                   A.DE_NIVEL_ALC AS DE_NIVEL_ALC,
+                   A.CO_NIVEL AS CO_NIVEL_EST,
+                   B.DE_NIVEL AS DES_NIVEL_EST,
+                   A.NU_SECUENCIA AS NU_SECUENCIA,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO
+          FROM     IDO_RRHH.RHTM_NIVEL_ALCANZADO A,
+                   IDO_RRHH.RHTM_NIVEL_ESTUDIOS B
+
+          WHERE
+          A.CO_NIVEL=B.CO_NIVEL
+          AND
+          B.IN_ESTADO='1'
+          AND
+          A.IN_ESTADO=p_cIN_NIVA
+          ORDER BY  A.FE_CREACION  DESC;
+     END;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_NIVEL_ALCANZADO(p_nIN_COD_NIVA IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          FROM   IDO_RRHH.RHTM_NIVEL_ALCANZADO A
+          WHERE  A.CO_NIVEL_ALC=p_nIN_COD_NIVA;
+     END;
+END;
+
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_NIVEL_ALCANZADO(p_nIN_COD_NIVA IN  INTEGER,
+                                p_nIN_COD_NEST IN  INTEGER,
+                                p_vIN_DE_NIVEL_ALCANZADO IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_NIVEL_ALCANZADO
+          SET    DE_NIVEL_ALC = p_vIN_DE_NIVEL_ALCANZADO,
+                 CO_NIVEL = p_nIN_COD_NEST,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_NIVEL_ALC=p_nIN_COD_NIVA;
+          --v_nNU_ERROR := 2;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_NIVEL_ALCANZADO(p_nIN_COD_NIVA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_NIVEL_ALCANZADO
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_NIVEL_ALC=p_nIN_COD_NIVA;
+          --v_nNU_ERROR := 3;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+
+----METODOS PARA TRABAJAR NIVEL DE ESTUDIOS ALCANZADOS
+---metodo para enlistar combos:
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_COMBO_TIPO_INST_ACAD( p_crOUT_CURSOR_LISTA OUT SYS_REFCURSOR ) IS
+    Begin
+      Begin
+            OPEN p_crOUT_CURSOR_LISTA FOR
+   SELECT
+   A.CO_TIPO_INST AS CODIGO_TIPO_INST_ACAD,
+   A.DE_TIPO_INST AS DESCRIPCION_TIPO_INST_ACAD
+   FROM IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD A
+   WHERE A.IN_ESTADO='1'
+   ORDER BY A.FE_CREACION DESC;
+   END;
+   END;
+   ------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_INST_ACAD(p_cIN_IA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                   A.CO_INSTITUCION AS CO_INSTITUCION,
+                   A.DE_INSTITUCION AS DE_INSTITUCION,
+                   A.CO_TIPO_INST AS CO_TIPO_INST,
+                   B.DE_TIPO_INST AS DE_TIPO_INST,
+                   A.NU_SECUENCIA AS NU_SECUENCIA,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO
+          FROM     IDO_RRHH.RHTM_INSTITUCION_ACADEMICA A,
+                   IDO_RRHH.RHTR_TIPO_INSTITUCION_ACAD B
+
+          WHERE
+          A.CO_TIPO_INST=B.CO_TIPO_INST
+          AND
+          B.IN_ESTADO='1'
+          AND
+          A.IN_ESTADO=p_cIN_IA
+          ORDER BY  A.FE_CREACION  DESC;
+     END;
+END;
+
+
+   ----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_INST_ACADEMICA(p_nIN_COD_IA IN  INTEGER,
+                                 p_vIN_DE_INST_ACAD IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_INST_ACAD  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_INSTITUCION_ACADEMICA.NEXTVAL
+            INTO   v_nNU_INST_ACAD
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            FROM   IDO_RRHH.RHTM_INSTITUCION_ACADEMICA;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            FROM IDO_RRHH.RHTM_INSTITUCION_ACADEMICA
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+
+            INSERT INTO IDO_RRHH.RHTM_INSTITUCION_ACADEMICA (CO_INSTITUCION,
+                                           DE_INSTITUCION,
+                                           CO_TIPO_INST,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_INST_ACAD,
+                                                      p_vIN_DE_INST_ACAD,
+                                                      p_nIN_COD_IA,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            FROM   IDO_RRHH.RHTM_INSTITUCION_ACADEMICA A
+            WHERE A.CO_INSTITUCION=v_nNU_INST_ACAD;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            FROM   IDO_RRHH.RHTM_INSTITUCION_ACADEMICA A
+            WHERE  A.CO_INSTITUCION=v_nNU_INST_ACAD;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_INSTITUCION_ACAD(p_nIN_COD_IA IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          FROM   IDO_RRHH.RHTM_INSTITUCION_ACADEMICA A
+          WHERE  A.CO_INSTITUCION=p_nIN_COD_IA;
+     END;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_INST_ACADEMICA(p_nIN_COD_IA IN  INTEGER,
+                                p_nIN_COD_TIA IN  INTEGER,
+                                p_vIN_DE_INST_ACADEMICA IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_INSTITUCION_ACADEMICA
+          SET    DE_INSTITUCION = p_vIN_DE_INST_ACADEMICA,
+                 CO_TIPO_INST = p_nIN_COD_TIA,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_INSTITUCION=p_nIN_COD_IA;
+          --v_nNU_ERROR := 2;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_INST_ACADEMICA(p_nIN_COD_IA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_INSTITUCION_ACADEMICA
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_INSTITUCION=p_nIN_COD_IA;
+          v_nNU_ERROR := 1;
+          --v_nNU_ERROR := 3;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_AREA(p_vIN_DESCRIP_AREA IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_AREA  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_AREA.NEXTVAL
+            INTO   v_nNU_AREA
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            FROM   IDO_RRHH.RHTM_AREA;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            FROM IDO_RRHH.RHTM_AREA
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+
+            INSERT INTO IDO_RRHH.RHTM_AREA (CO_AREA,
+                                           DE_AREA,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_AREA,
+                                                      p_vIN_DESCRIP_AREA,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            FROM   IDO_RRHH.RHTM_AREA A
+            WHERE A.CO_AREA=v_nNU_AREA;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            FROM   IDO_RRHH.RHTM_AREA A
+            WHERE  A.CO_AREA=v_nNU_AREA;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_AREA(p_cIN_AREA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_AREA AS COD_AREA,
+                   A.DE_AREA AS DESCRIP_AREA,
+                   A.NU_SECUENCIA AS SEC_ESP,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO,
+                   ROWNUM AS FILA
+          FROM     IDO_RRHH.RHTM_AREA A WHERE A.IN_ESTADO=p_cIN_AREA
+          ORDER BY A.CO_AREA ASC;
+     END;
+END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_AREA(p_nIN_COD_AREA IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          FROM   IDO_RRHH.RHTM_AREA A
+          WHERE  A.CO_AREA=p_nIN_COD_AREA;
+     END;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_AREA(p_nIN_COD_AREA IN  INTEGER,
+                                p_vIN_DE_AREA IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_AREA
+          SET    DE_AREA = p_vIN_DE_AREA,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_AREA=p_nIN_COD_AREA;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :  portador
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_AREA(p_nIN_COD_AREA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_AREA
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_AREA=p_nIN_COD_AREA;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS J. ORTEGA DELGADO
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_CARGO(p_vIN_DESCRIP_CARGO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_CARGO  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_CARGO.NEXTVAL
+            INTO   v_nNU_CARGO
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            FROM   IDO_RRHH.RHTM_CARGO;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            FROM IDO_RRHH.RHTM_CARGO
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+
+            INSERT INTO IDO_RRHH.RHTM_CARGO (CO_CARGO,
+                                           DE_CARGO,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_CARGO,
+                                                      p_vIN_DESCRIP_CARGO,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            FROM   IDO_RRHH.RHTM_CARGO A
+            WHERE A.CO_CARGO=v_nNU_CARGO;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            FROM   IDO_RRHH.RHTM_CARGO A
+            WHERE  A.CO_CARGO=v_nNU_CARGO;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS J. ORTEGA DELGADO
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_CARGO(p_cIN_CARGO IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_CARGO AS COD_CARGO,
+                   A.DE_CARGO AS DESCRIP_CARGO,
+                   A.NU_SECUENCIA AS SEC_CARGO,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO,
+                   ROWNUM AS FILA
+          FROM     IDO_RRHH.RHTM_CARGO A WHERE A.IN_ESTADO=p_cIN_CARGO
+          ORDER BY A.CO_CARGO ASC;
+     END;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA DELGADO
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          FROM   IDO_RRHH.RHTM_CARGO A
+          WHERE  A.CO_CARGO=p_nIN_COD_CARGO;
+     END;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA DELGADO
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+                                p_vIN_DE_CARGO IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_CARGO
+          SET    DE_CARGO = p_vIN_DE_CARGO,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_CARGO=p_nIN_COD_CARGO;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS J. ORTEGA DELGADO
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_CARGO
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_CARGO=p_nIN_COD_CARGO;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_TIPO_ESPECIALIZACION(p_vIN_DESCRIP_TIP_ESP IN VARCHAR2,
+                                         p_nIN_HORAS_CON_ER IN  INTEGER,
+                                         p_nIN_HORAS_SIN_ER IN  INTEGER,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_TIP_ESPECIALIZACION  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_TIPO_ESPECIALIZACION.NEXTVAL
+            INTO   v_nNU_TIP_ESPECIALIZACION
+            FROM   DUAL;
+
+            --obtengo el max año de la tabla de contenido medio portador
+            SELECT DECODE(MAX(NVL(NU_ANIO,v_nNU_ANIO_SYS)),'',v_nNU_ANIO_SYS,v_nNU_ANIO_SYS)
+            INTO   v_nNU_ANIO_ACT
+            FROM   IDO_RRHH.RHTM_TIPO_ESPECIALIZACION;
+
+            --comparo si el año de la tabla de contenido medio portador es menor
+            --a la fecha del actual del sistema
+            IF v_nNU_ANIO_ACT < v_nNU_ANIO_SYS THEN
+               v_nNU_ANIO_ACT := v_nNU_ANIO_SYS;
+            END IF;
+
+            --obtengo la secuencia a partir del año actual
+            SELECT DECODE(MAX(NVL(NU_SECUENCIA,0))+1,'',1,MAX(NU_SECUENCIA)+1)
+            INTO v_nNU_SECUENCIA
+            FROM IDO_RRHH.RHTM_TIPO_ESPECIALIZACION
+            WHERE NU_ANIO=v_nNU_ANIO_ACT;--año actual
+
+
+            INSERT INTO IDO_RRHH.RHTM_TIPO_ESPECIALIZACION (CO_TIPO_ESP,
+                                           DE_TIPO_ESP,
+                                           CA_HORAS_CON_ER,
+                                           CA_HORAS_SIN_ER,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           NU_SECUENCIA,
+                                           NU_ANIO)
+                                               VALUES (v_nNU_TIP_ESPECIALIZACION,
+                                                      p_vIN_DESCRIP_TIP_ESP,
+                                                      p_nIN_HORAS_CON_ER,
+                                                      p_nIN_HORAS_SIN_ER,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE,
+                                                       v_nNU_SECUENCIA,
+                                                       v_nNU_ANIO_ACT);
+
+            --selección de la fecha de registro recien ingresada
+            SELECT TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FEC_REG
+            INTO   v_vOUT_FEC_REG
+            FROM   IDO_RRHH.RHTM_TIPO_ESPECIALIZACION A
+            WHERE A.CO_TIPO_ESP=v_nNU_TIP_ESPECIALIZACION;
+
+            --generación del código
+            SELECT A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO
+            INTO   v_vCODIGO_GENERADO
+            FROM   IDO_RRHH.RHTM_TIPO_ESPECIALIZACION A
+            WHERE  A.CO_TIPO_ESP=v_nNU_TIP_ESPECIALIZACION;
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+
+            --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_TIP_ESP(p_cIN_TIP_ESP IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_TIPO_ESP AS COD_TIP_ESP,
+                   A.DE_TIPO_ESP AS DESCRIP_TIP_ESP,
+                   A.NU_SECUENCIA AS SEC_ESP,
+                   A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                   A.FE_CREACION AS FECHA_REGISTRO,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS ESTADO,
+                   A.CA_HORAS_CON_ER AS HORAS_CON_ER,
+                   A.CA_HORAS_SIN_ER AS HOORAS_SIN_ER,
+                   ROWNUM AS FILA
+          FROM     IDO_RRHH.RHTM_TIPO_ESPECIALIZACION A WHERE A.IN_ESTADO=p_cIN_TIP_ESP
+          ORDER BY A.CO_TIPO_ESP ASC;
+     END;
+END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_TIPO_ESPECIALIZACION(p_nIN_COD_TIP_ESP IN  INTEGER,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT A.*,
+                 A.NU_ANIO||LPAD(A.NU_SECUENCIA,6,'0') AS CODIGO_GENERADO,
+                 TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT
+          FROM   IDO_RRHH.RHTM_TIPO_ESPECIALIZACION A
+          WHERE  A.CO_TIPO_ESP=p_nIN_COD_TIP_ESP;
+     END;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_TIPO_ESPECIALIZACION(p_nIN_COD_TIP_ESP IN  INTEGER,
+                                p_vIN_DE_TIP_ESP IN VARCHAR2,
+                                p_nIN_CA_HORAS_CON_ER IN  INTEGER,
+                                p_nIN_CA_HORAS_SIN_ER IN  INTEGER,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_TIPO_ESPECIALIZACION
+          SET    DE_TIPO_ESP = p_vIN_DE_TIP_ESP,
+                 CA_HORAS_CON_ER = p_nIN_CA_HORAS_CON_ER,
+                 CA_HORAS_SIN_ER = p_nIN_CA_HORAS_SIN_ER,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_TIPO_ESP=p_nIN_COD_TIP_ESP;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_TIPO_ESP(p_nIN_COD_TIPO_ESP IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_TIPO_ESPECIALIZACION
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_TIPO_ESP=p_nIN_COD_TIPO_ESP;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+
+--ZONA DE CONVOCATORIAS
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LIST_TIPO_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_TIPO AS COD_TIPO_CONVOCATORIA,
+                   A.DE_TIPO AS DE_TIPO_CONVOCATORIA
+          FROM     IDO_RRHH.RHTR_TIPO_CONV A
+          WHERE
+          A.IN_ESTADO = '1'
+          ORDER BY A.CO_TIPO ASC;
+     END;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LIST_ETAPA_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_ETAPA AS COD_ETAPA_CONVOCATORIA,
+                   A.DE_ETAPA AS DE_ETAPA_CONVOCATORIA
+          FROM     IDO_RRHH.RHTR_ETAPA_CONV A
+          WHERE
+          A.IN_ESTADO = '1'
+          ORDER BY A.CO_ETAPA ASC;
+     END;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+
+PROCEDURE SFSP_LST_NIVEL_ALC_XFILTRO(p_vIN_DE_FILTRO IN VARCHAR2,
+                                     p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     DECLARE
+     v_vQUERY VARCHAR2(2000);
+     v_vCONDICION VARCHAR2(200):='';
+     BEGIN
+          v_vQUERY := 'SELECT
+                ROWNUM AS FILA,
+                A.CO_NIVEL_ALC AS CO_NIVEL_ALC,
+                B.DE_NIVEL AS DE_NIVEL,
+                A.DE_NIVEL_ALC AS DE_NIVEL_ALC
+                FROM IDO_RRHH.RHTM_NIVEL_ALCANZADO A,IDO_RRHH.RHTM_NIVEL_ESTUDIOS B
+                WHERE
+                A.CO_NIVEL IN ('||p_vIN_DE_FILTRO||')
+                AND A.CO_NIVEL=B.CO_NIVEL
+                AND A.IN_ESTADO=''1''
+                AND B.IN_ESTADO=''1''';
+          OPEN  p_crCURSOR_PRINCIPAL FOR v_vQUERY;
+     END;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_DESCRIP_CONV IN VARCHAR2,
+                                 p_vIN_CO_UUOO IN VARCHAR2,
+                                 p_vIN_CO_UBICACION IN VARCHAR2,
+                                 p_dFE_INI_IN IN DATE,
+                                 p_dFE_FIN_IN IN DATE,
+                                 p_vIN_ESTADO IN VARCHAR2,
+                                 p_nIN_COD_ETAPA IN  INTEGER,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_COLEGIATURA IN VARCHAR2,
+                                 p_vIN_CO_SUB_GERENCIA IN VARCHAR2,
+                                 p_vIN_DE_UUOO IN VARCHAR2,
+                                 p_vIN_DE_UBICACION IN VARCHAR2,
+                                 p_nIN_CA_ANOS_EXP_GEN IN  INTEGER,
+                                 p_nIN_CA_ANOS_EXP_ESP IN  INTEGER,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_CONVOCATORIA  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_CONVOCATORIA.NEXTVAL
+            INTO   v_nNU_SECUENCIA
+            FROM   DUAL;
+
+            INSERT INTO IDO_RRHH.RHTM_CONVOCATORIA (NU_CONV,
+                                           ANO_CONV,
+                                           DE_CONV,
+                                           CO_UUOO,
+                                           CO_UBICACION,
+                                           FE_INI_CONV,
+                                           FE_FIN_CONV,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           CO_ETAPA,
+                                           CO_TIPO,
+                                           SE_CONV,
+                                           IN_COLEGIATURA,
+                                           CO_SUB_GERENCIA,
+                                           DE_UUOO,
+                                           DE_UBICACION,
+                                           CA_ANOS_EXP_GEN,
+                                           CA_ANOS_EXP_ESP)
+                                               VALUES (p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_DESCRIP_CONV,
+                                                      p_vIN_CO_UUOO,
+                                                      p_vIN_CO_UBICACION,
+                                                      p_dFE_INI_IN,
+                                                      p_dFE_FIN_IN,
+                                                      p_vIN_ESTADO,
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      p_nIN_COD_ETAPA,
+                                                      p_vIN_CO_TIPO,
+                                                      v_nNU_SECUENCIA,
+                                                      p_vIN_COLEGIATURA,
+                                                      p_vIN_CO_SUB_GERENCIA,
+                                                      p_vIN_DE_UUOO,
+                                                      p_vIN_DE_UBICACION,
+                                                      p_nIN_CA_ANOS_EXP_GEN,
+                                                      p_nIN_CA_ANOS_EXP_ESP);
+
+
+            v_nNU_ERROR := v_nNU_SECUENCIA;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_PERFIL_NIVEL(p_nIN_CO_NIVEL_ALC IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             --v_nNU_ANIO_ACT     NUMBER := 0;
+             --v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             --v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+           --obtención del codigo primario a partir de la secuencia
+            SELECT IDO_RRHH.SEQ_PERFIL_NIVEL.NEXTVAL
+            INTO   v_nNU_SECUENCIA
+            FROM   DUAL;
+
+            INSERT INTO IDO_RRHH.RHTD_PERFIL_NIVEL (CO_NIVEL_ALC,
+                                           NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           SEC_PERFIL_NIVEL)
+                                               VALUES (p_nIN_CO_NIVEL_ALC,
+                                                      p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_CO_TIPO,
+                                                      '1',
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      v_nNU_SECUENCIA);
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV||'|'||p_nIN_CO_NIVEL_ALC;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_PERFIL_AREA(p_nIN_COD_AREA IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+     BEGIN
+
+     SELECT IDO_RRHH.SEQ_PERFIL_AREA.NEXTVAL
+            INTO   v_nNU_SECUENCIA
+            FROM   DUAL;
+
+            INSERT INTO IDO_RRHH.RHTD_PERFIL_AREA (CO_AREA,
+                                           NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           SEC_PERFIL_AREA)
+                                               VALUES (p_nIN_COD_AREA,
+                                                      p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_CO_TIPO,
+                                                      '1',
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      v_nNU_SECUENCIA);
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV||'|'||p_nIN_COD_AREA;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_PERFIL_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+     BEGIN
+
+     SELECT IDO_RRHH.SEQ_PERFIL_CARGO.NEXTVAL
+            INTO   v_nNU_SECUENCIA
+            FROM   DUAL;
+
+            INSERT INTO IDO_RRHH.RHTD_PERFIL_CARGO (CO_CARGO,
+                                           NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           SEC_PERFIL_CARGO)
+                                               VALUES (p_nIN_COD_CARGO,
+                                                      p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_CO_TIPO,
+                                                      '1',
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      v_nNU_SECUENCIA);
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV||'|'||p_nIN_COD_CARGO;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_PERFIL_ESPECIALIDAD(p_nIN_COD_ESPECIALIDAD IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+     BEGIN
+
+     SELECT IDO_RRHH.SEQ_PERFIL_ESPECIALIDAD.NEXTVAL
+            INTO   v_nNU_SECUENCIA
+            FROM   DUAL;
+
+            INSERT INTO IDO_RRHH.RHTD_PERFIL_ESPECIALIDAD (CO_ESPECIALIDAD,
+                                           NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           SEC_PERFIL_ESPECIALIDAD)
+                                               VALUES (p_nIN_COD_ESPECIALIDAD,
+                                                      p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_CO_TIPO,
+                                                      '1',
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      v_nNU_SECUENCIA);
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV||'|'||p_nIN_COD_ESPECIALIDAD;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_PERFIL_TIP_ESP(p_nIN_COD_TIPO_ESP IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+     BEGIN
+
+     SELECT IDO_RRHH.SEQ_PERFIL_TIPO_ESPECIALIZA.NEXTVAL
+            INTO   v_nNU_SECUENCIA
+            FROM   DUAL;
+
+            INSERT INTO IDO_RRHH.RHTD_PERFIL_TIPO_ESPECIALIZA (CO_TIPO_ESP,
+                                           NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           SEC_PERFIL_TIPO_ESPECIALIZA)
+                                               VALUES (p_nIN_COD_TIPO_ESP,
+                                                      p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_CO_TIPO,
+                                                      '1',
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      v_nNU_SECUENCIA);
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV||'|'||p_nIN_COD_TIPO_ESP;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_PERFIL_INSTITUCION(p_nIN_COD_TIPO_INST IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+     BEGIN
+
+     SELECT IDO_RRHH.SEQ_PERFIL_INSTITUCION.NEXTVAL
+            INTO   v_nNU_SECUENCIA
+            FROM   DUAL;
+
+            INSERT INTO IDO_RRHH.RHTD_PERFIL_INSTITUCION (CO_TIPO_INST,
+                                           NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           SEC_PERFIL_INSTITUCION)
+                                               VALUES (p_nIN_COD_TIPO_INST,
+                                                      p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_CO_TIPO,
+                                                      '1',
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      v_nNU_SECUENCIA);
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV||'|'||p_nIN_COD_TIPO_INST;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                T.NU_CONV AS NUMERO_CONVOCATORIA,
+                T.ANO_CONV AS ANIO_CONVOCATORIA,
+                T.DE_CONV AS DESCRIPCION_CONVOCATORIA,
+                TO_CHAR(T.FE_INI_CONV, 'DD/MM/YYYY') AS FECHA_INICIO_CONVOCATORIA_TXT,
+                TO_CHAR(T.FE_FIN_CONV, 'DD/MM/YYYY') AS FECHA_FIN_CONVOCATORIA_TXT,
+                A.DE_TIPO AS TIPO_CONVOCATORIA,
+                B.DE_ETAPA AS ETAPA_CONVOCATORIA,
+                DECODE(T.IN_ESTADO,'1','ACTIVO','0','INACTIVO') AS ESTADO_CONVOCATORIA,
+                TO_CHAR(T.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                T.US_CREACION AS USUARIO_REGISTRO,
+                T.IN_ESTADO AS ESTADO
+           FROM
+                IDO_RRHH.RHTM_CONVOCATORIA T,
+                IDO_RRHH.RHTR_TIPO_CONV A ,
+                IDO_RRHH.RHTR_ETAPA_CONV B
+           WHERE
+                T.CO_TIPO = A.CO_TIPO
+                AND T.CO_ETAPA = B.CO_ETAPA
+                ORDER BY T.NU_CONV DESC,T.ANO_CONV DESC;
+     END;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION SFFU_INSERT_PDF_BASE_CONV(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_blIN_PDF IN BLOB,
+                                 p_blIN_RUTA_PDF IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                v_vOUT_VALORES VARCHAR2(200);
+BEGIN
+  DECLARE
+  v_nEXISTE_LOTE NUMBER;
+     BEGIN
+           INSERT INTO IDO_RRHH.RHTV_ARCHIVO_CONV (NU_CONV,
+                                                   ANO_CONV,
+                                                   BL_BRC,
+                                                   US_CREACION,
+                                                   FE_CREACION,
+                                                   RUTA_BL_BRC,
+                                                   CO_TIPO)
+                                                   VALUES (p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_blIN_PDF,
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      p_blIN_RUTA_PDF,
+                                                      p_vIN_CO_TIPO);
+        v_vOUT_VALORES := 2;
+
+        EXCEPTION
+        WHEN OTHERS THEN
+        v_vOUT_VALORES := -1;
+        END;
+        RETURN v_vOUT_VALORES;
+        END;
+
+-------------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_GET_CADENA_PERFIL_NIVEL(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                       v_vCADENA_TEMP VARCHAR2(32767);
+BEGIN
+      SELECT LTRIM(MAX(NAMES), '|') AS NAMES INTO v_vCADENA_TEMP
+      FROM (SELECT SYS_CONNECT_BY_PATH(CO_NIVEL_ALC, '|') AS NAMES
+            FROM (
+            SELECT CO_NIVEL_ALC, ROW_NUMBER() OVER (ORDER BY CO_NIVEL_ALC) AS ROWN
+            FROM IDO_RRHH.RHTD_PERFIL_NIVEL WHERE NU_CONV=p_vIN_NUM_CONV AND ANO_CONV=p_vIN_ANIO_CONV AND IN_ESTADO='1' --ES EL ID DE LINEA PRODUCCION
+            )
+            START WITH ROWN = 1
+            CONNECT BY ROWN = PRIOR ROWN + 1);
+RETURN v_vCADENA_TEMP;
+END;
+
+-------------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_GET_CADENA_PERFIL_AREA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                       v_vCADENA_TEMP VARCHAR2(32767);
+BEGIN
+      SELECT LTRIM(MAX(NAMES), '|') AS NAMES INTO v_vCADENA_TEMP
+      FROM (SELECT SYS_CONNECT_BY_PATH(CO_AREA, '|') AS NAMES
+            FROM (
+            SELECT CO_AREA, ROW_NUMBER() OVER (ORDER BY CO_AREA) AS ROWN
+            FROM IDO_RRHH.RHTD_PERFIL_AREA WHERE NU_CONV=p_vIN_NUM_CONV AND ANO_CONV=p_vIN_ANIO_CONV AND IN_ESTADO='1'--ES EL ID DE LINEA PRODUCCION
+            )
+            START WITH ROWN = 1
+            CONNECT BY ROWN = PRIOR ROWN + 1);
+RETURN v_vCADENA_TEMP;
+END;
+
+-------------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_GET_CADENA_PERFIL_CARGO(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                       v_vCADENA_TEMP VARCHAR2(32767);
+BEGIN
+      SELECT LTRIM(MAX(NAMES), '|') AS NAMES INTO v_vCADENA_TEMP
+      FROM (SELECT SYS_CONNECT_BY_PATH(CO_CARGO, '|') AS NAMES
+            FROM (
+            SELECT CO_CARGO, ROW_NUMBER() OVER (ORDER BY CO_CARGO) AS ROWN
+            FROM IDO_RRHH.RHTD_PERFIL_CARGO WHERE NU_CONV=p_vIN_NUM_CONV AND ANO_CONV=p_vIN_ANIO_CONV AND IN_ESTADO='1'--ES EL ID DE LINEA PRODUCCION
+            )
+            START WITH ROWN = 1
+            CONNECT BY ROWN = PRIOR ROWN + 1);
+RETURN v_vCADENA_TEMP;
+END;
+
+-------------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_GET_CADENA_PERFIL_ESP(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                       v_vCADENA_TEMP VARCHAR2(32767);
+BEGIN
+      SELECT LTRIM(MAX(NAMES), '|') AS NAMES INTO v_vCADENA_TEMP
+      FROM (SELECT SYS_CONNECT_BY_PATH(CO_ESPECIALIDAD, '|') AS NAMES
+            FROM (
+            SELECT CO_ESPECIALIDAD, ROW_NUMBER() OVER (ORDER BY CO_ESPECIALIDAD) AS ROWN
+            FROM IDO_RRHH.RHTD_PERFIL_ESPECIALIDAD WHERE NU_CONV=p_vIN_NUM_CONV AND ANO_CONV=p_vIN_ANIO_CONV AND IN_ESTADO='1'--ES EL ID DE LINEA PRODUCCION
+            )
+            START WITH ROWN = 1
+            CONNECT BY ROWN = PRIOR ROWN + 1);
+RETURN v_vCADENA_TEMP;
+END;
+
+-------------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_GET_CADENA_PERFIL_TIP_ESP(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                       v_vCADENA_TEMP VARCHAR2(32767);
+BEGIN
+      SELECT LTRIM(MAX(NAMES), '|') AS NAMES INTO v_vCADENA_TEMP
+      FROM (SELECT SYS_CONNECT_BY_PATH(CO_TIPO_ESP, '|') AS NAMES
+            FROM (
+            SELECT CO_TIPO_ESP, ROW_NUMBER() OVER (ORDER BY CO_TIPO_ESP) AS ROWN
+            FROM IDO_RRHH.RHTD_PERFIL_TIPO_ESPECIALIZA WHERE NU_CONV=p_vIN_NUM_CONV AND ANO_CONV=p_vIN_ANIO_CONV AND IN_ESTADO='1'--ES EL ID DE LINEA PRODUCCION
+            )
+            START WITH ROWN = 1
+            CONNECT BY ROWN = PRIOR ROWN + 1);
+RETURN v_vCADENA_TEMP;
+END;
+
+-------------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_GET_CADENA_PERFIL_INSTI(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                       v_vCADENA_TEMP VARCHAR2(32767);
+BEGIN
+      SELECT LTRIM(MAX(NAMES), '|') AS NAMES INTO v_vCADENA_TEMP
+      FROM (SELECT SYS_CONNECT_BY_PATH(CO_TIPO_INST, '|') AS NAMES
+            FROM (
+            SELECT CO_TIPO_INST, ROW_NUMBER() OVER (ORDER BY CO_TIPO_INST) AS ROWN
+            FROM IDO_RRHH.RHTD_PERFIL_INSTITUCION WHERE NU_CONV=p_vIN_NUM_CONV AND ANO_CONV=p_vIN_ANIO_CONV AND IN_ESTADO='1'--ES EL ID DE LINEA PRODUCCION
+            )
+            START WITH ROWN = 1
+            CONNECT BY ROWN = PRIOR ROWN + 1);
+RETURN v_vCADENA_TEMP;
+END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                 A.NU_CONV AS NUMERO_CONVOCATORIA,
+                 A.ANO_CONV AS ANIO_CONVOCATORIA,
+                 A.DE_CONV AS TITULO_CONVOCATORIA
+          FROM   IDO_RRHH.RHTM_CONVOCATORIA A
+          WHERE  A.NU_CONV = p_vIN_NUM_CONV
+          AND    A.ANO_CONV = p_vIN_ANIO_CONV;
+     END;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : PROCEDURE QUE aCTUALIZA El ARCHIVO PDF DE ACTA DE APERTURA
+----------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_PDF_ARCHIVO_CONV(p_vIN_NUM_CONV IN VARCHAR2,
+                                    p_vIN_ANIO_CONV IN VARCHAR2,
+                                    p_vIN_TIPO_CONV IN VARCHAR2,
+                                    p_vIN_US_MOD IN VARCHAR2,
+                                    p_blNOM_PDF_ARCHIVO IN VARCHAR2,
+                                    p_blIN_PDF_ARCHIVO IN BLOB,
+                                    p_blIN_RUTA_PDF IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                v_vOUT_VALORES VARCHAR2(200);
+BEGIN
+      DECLARE
+      v_nEXISTE_LOTE NUMBER;
+      BEGIN
+      IF ( p_vIN_TIPO_CONV = '1' ) THEN
+
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_BRC=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_BRC = p_blIN_RUTA_PDF,
+               T.US_UPDATE = p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES ;
+      ELSIF  ( p_vIN_TIPO_CONV = '2' ) THEN
+               BEGIN
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_LI=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_LI = p_blIN_RUTA_PDF,
+               T.US_UPDATE=p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               END;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES;
+      ELSIF  ( p_vIN_TIPO_CONV = '3' ) THEN
+               BEGIN
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_REC=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_REC = p_blIN_RUTA_PDF,
+               T.US_UPDATE=p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               END;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES;
+      ELSIF  ( p_vIN_TIPO_CONV = '4' ) THEN
+               BEGIN
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_RCV=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_RCV = p_blIN_RUTA_PDF,
+               T.US_UPDATE=p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               END;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES;
+      ELSIF  ( p_vIN_TIPO_CONV = '5' ) THEN
+               BEGIN
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_REP=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_REP = p_blIN_RUTA_PDF,
+               T.US_UPDATE=p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               END;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES;
+      ELSIF  ( p_vIN_TIPO_CONV = '6' ) THEN
+               BEGIN
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_COM1=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_COM1 = p_blIN_RUTA_PDF,
+               T.US_UPDATE=p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               END;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES;
+
+      ELSIF  ( p_vIN_TIPO_CONV = '7' ) THEN
+               BEGIN
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_COM2=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_COM2 = p_blIN_RUTA_PDF,
+               T.US_UPDATE=p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               END;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES;
+      ELSIF  ( p_vIN_TIPO_CONV = '8' ) THEN
+               BEGIN
+               UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_COM3=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_COM3 = p_blIN_RUTA_PDF,
+               T.US_UPDATE=p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+               END;
+               v_vOUT_VALORES := '2';
+               RETURN v_vOUT_VALORES;
+      ELSE
+              RETURN '-1'||'|'||'NO EXISTE OPCION SELECCIONADA';
+              END IF;
+      EXCEPTION
+                WHEN OTHERS THEN
+                     RETURN '-1'||'|'||SQLCODE||'-'||SQLERRM;
+      END;
+      END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_EDITAR_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                 A.NU_CONV AS NUMERO_CONVOCATORIA,
+                 A.ANO_CONV AS ANIO_CONVOCATORIA,
+                 A.IN_ESTADO AS ESTADO_CONVOCATORIA,
+                 A.CO_TIPO AS TIPO_CONVOCATORIA,
+                 A.CO_ETAPA AS ETAPA_CONVOCATORIA,
+                 A.DE_CONV AS TITULO_CONVOCATORIA,
+                 TO_CHAR(A.FE_INI_CONV, 'DD/MM/YYYY') AS FECHA_INICIO_CONVOCATORIA,
+                 TO_CHAR(A.FE_FIN_CONV, 'DD/MM/YYYY') AS FECHA_FIN_CONVOCATORIA,
+                 A.CO_UUOO AS DEPENDENCIA_PADRE,
+                 A.DE_UUOO AS DESCRIPCION_DEPENDENCIA_PADRE,
+                 A.CO_SUB_GERENCIA AS DEPENDENCIA_HIJO,
+                 A.CO_UBICACION AS CODIGO_UBIGEO,
+                 A.DE_UBICACION AS DESCRIPCION_UBIGEO,
+                 A.IN_COLEGIATURA AS COLEGIATURA,
+                 (SELECT IDO_RRHH.RHPK_CONVOCATORIAS.SFFU_CADENA_LISTA_NIV_ESTUDIO(p_vIN_NUM_CONV,p_vIN_ANIO_CONV) FROM DUAL) AS PERFIL_NIVEL_ESTUDIOS,
+                 (SELECT IDO_RRHH.RHPK_CONVOCATORIAS.SFFU_GET_CADENA_PERFIL_NIVEL(p_vIN_NUM_CONV,p_vIN_ANIO_CONV) FROM DUAL) AS PERFIL_NIVEL_ALCANZADO,
+                 (SELECT IDO_RRHH.RHPK_CONVOCATORIAS.SFFU_GET_CADENA_PERFIL_ESP(p_vIN_NUM_CONV,p_vIN_ANIO_CONV) FROM DUAL) AS PERFIL_ESPECIALIDAD,
+                 (SELECT IDO_RRHH.RHPK_CONVOCATORIAS.SFFU_GET_CADENA_PERFIL_INSTI(p_vIN_NUM_CONV,p_vIN_ANIO_CONV) FROM DUAL) AS PERFIL_TIPO_INSTITUCION,
+                 (SELECT IDO_RRHH.RHPK_CONVOCATORIAS.SFFU_GET_CADENA_PERFIL_TIP_ESP(p_vIN_NUM_CONV,p_vIN_ANIO_CONV) FROM DUAL) AS PERFIL_TIPO_ESPECIALIZACION,
+                 (SELECT IDO_RRHH.RHPK_CONVOCATORIAS.SFFU_GET_CADENA_PERFIL_CARGO(p_vIN_NUM_CONV,p_vIN_ANIO_CONV) FROM DUAL) AS PERFIL_NIVEL_CARGO,
+                 (SELECT IDO_RRHH.RHPK_CONVOCATORIAS.SFFU_GET_CADENA_PERFIL_AREA(p_vIN_NUM_CONV,p_vIN_ANIO_CONV) FROM DUAL) AS PERFIL_AREA,
+                 A.CA_ANOS_EXP_GEN AS EXPERIENCIA_GENERAL,
+                 A.CA_ANOS_EXP_ESP AS EXPERIENCIA_ESPECIFICA,
+                 (SELECT T.RUTA_BL_BRC  FROM IDO_RRHH.RHTV_ARCHIVO_CONV T WHERE T.NU_CONV= p_vIN_NUM_CONV AND T.ANO_CONV=p_vIN_ANIO_CONV) AS RUTA_BASES_CONVOCATORIA
+          FROM   IDO_RRHH.RHTM_CONVOCATORIA A
+          WHERE  A.NU_CONV = p_vIN_NUM_CONV
+          AND    A.ANO_CONV = p_vIN_ANIO_CONV;
+     END;
+END;
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION SFFU_CADENA_LISTA_NIV_ESTUDIO(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                      v_vCADENA_TEMP VARCHAR2(32767);
+BEGIN
+      DECLARE
+              v_crCURSOR_TEMPORAL SYS_REFCURSOR;
+              v_vVALOR_TEMP VARCHAR2(32767);
+              v_nCONTADOR INTEGER:=0;
+      BEGIN
+
+              BEGIN
+                      OPEN   v_crCURSOR_TEMPORAL FOR
+                      SELECT
+                        DISTINCT(A.CO_NIVEL)
+                        FROM
+                        IDO_RRHH.RHTD_PERFIL_NIVEL T,
+                        IDO_RRHH.RHTM_NIVEL_ALCANZADO A
+                        WHERE
+                        T.NU_CONV = p_vIN_NUM_CONV
+                        AND T.ANO_CONV =p_vIN_ANIO_CONV
+                        AND T.CO_NIVEL_ALC = A.CO_NIVEL_ALC
+                        AND T.IN_ESTADO='1'
+                        AND A.IN_ESTADO='1';
+                  END;
+                  LOOP
+                  FETCH v_crCURSOR_TEMPORAL INTO v_vVALOR_TEMP;
+                  EXIT WHEN v_crCURSOR_TEMPORAL%NOTFOUND;
+                  --impresion en consola del valor
+                  DBMS_OUTPUT.PUT_LINE('VALOR '||v_vVALOR_TEMP);
+                  v_nCONTADOR:=v_nCONTADOR+1;
+                  v_vCADENA_TEMP:=v_vCADENA_TEMP||'|'||v_vVALOR_TEMP;
+                  --fin recorrido cursor
+                  END LOOP;
+                  --cerrar el cursor
+                  CLOSE v_crCURSOR_TEMPORAL;
+
+                  SELECT  TRIM(v_vCADENA_TEMP)
+                  INTO v_vCADENA_TEMP
+                  FROM DUAL;
+
+                  SELECT  SUBSTR(v_vCADENA_TEMP,2)
+                  INTO v_vCADENA_TEMP
+                  FROM DUAL;
+                  --v_vCADENA_TEMP:='prueba';
+                  RETURN v_vCADENA_TEMP;
+      EXCEPTION
+                WHEN OTHERS THEN
+                     RETURN '-1'||'|'||SQLCODE||'-'||SQLERRM;
+      END;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_UPDT_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_DESCRIP_CONV IN VARCHAR2,
+                                 p_vIN_CO_UUOO IN VARCHAR2,
+                                 p_vIN_CO_UBICACION IN VARCHAR2,
+                                 p_dFE_INI_IN IN DATE,
+                                 p_dFE_FIN_IN IN DATE,
+                                 p_vIN_ESTADO IN VARCHAR2,
+                                 p_nIN_COD_ETAPA IN  INTEGER,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_COLEGIATURA IN VARCHAR2,
+                                 p_vIN_CO_SUB_GERENCIA IN VARCHAR2,
+                                 p_vIN_DE_UUOO IN VARCHAR2,
+                                 p_vIN_DE_UBICACION IN VARCHAR2,
+                                 p_nIN_CA_ANOS_EXP_GEN IN  INTEGER,
+                                 p_nIN_CA_ANOS_EXP_ESP IN  INTEGER,
+                                 p_vIN_US_MOD IN VARCHAR2,
+                                 p_vIN_PRF_NIVEL_SLC IN VARCHAR2,
+                                 p_vIN_PRF_AREA_SLC IN VARCHAR2,
+                                 p_vIN_PRF_CARGO_SLC IN VARCHAR2,
+                                 p_vIN_PRF_ESP_SLC IN VARCHAR2,
+                                 p_vIN_PRF_TIP_ESP_SLC IN VARCHAR2,
+                                 p_vIN_PRF_INSTI_SLC IN VARCHAR2,
+                                 p_blIN_PDF IN BLOB,
+                                 p_blIN_RUTA_PDF IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(100);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_nNU_CONVOCATORIA  NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_ANIO_ACT     NUMBER := 0;
+             v_nNU_ANIO_SYS     NUMBER := TO_NUMBER(TO_CHAR(SYSDATE,'YYYY'));
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+             v_blBL_BRC  BLOB;
+     BEGIN
+
+     DBMS_OUTPUT.PUT_LINE('p_vIN_NUM_CONV :'||p_vIN_NUM_CONV);
+     DBMS_OUTPUT.PUT_LINE('p_vIN_ANIO_CONV :'||p_vIN_ANIO_CONV);
+     -- SELECCIONAMOS EL BLOB DE LA CONVOCATORIA
+            SELECT T.BL_BRC
+            INTO v_blBL_BRC
+            FROM
+            IDO_RRHH.RHTV_ARCHIVO_CONV T
+            WHERE
+            T.NU_CONV = p_vIN_NUM_CONV AND
+            T.ANO_CONV = p_vIN_ANIO_CONV ;
+      -- ELIMINAMOS LOS PERFILES DE NIVEL ALCANZADO INGRESADOS PREVIAMENTE
+            --IF ( p_vIN_PRF_NIVEL_SLC != '' OR p_vIN_PRF_NIVEL_SLC IS NOT NULL ) THEN
+            UPDATE IDO_RRHH.RHTD_PERFIL_NIVEL A
+            SET
+            A.IN_ESTADO = '0'
+            WHERE
+            A.NU_CONV = p_vIN_NUM_CONV AND
+            A.ANO_CONV = p_vIN_ANIO_CONV;
+
+            --END IF ;
+
+            -- ELIMINAMOS LOS PERFILES DE NIVEL ALCANZADO INGRESADOS PREVIAMENTE
+            --IF ( p_vIN_PRF_AREA_SLC != '' OR p_vIN_PRF_AREA_SLC IS NOT NULL ) THEN
+            UPDATE IDO_RRHH.RHTD_PERFIL_AREA B
+            SET
+            B.IN_ESTADO = '0'
+            WHERE
+            B.NU_CONV = p_vIN_NUM_CONV AND
+            B.ANO_CONV = p_vIN_ANIO_CONV;
+            --END IF;
+
+            -- ELIMINAMOS LOS PERFILES DE NIVEL ALCANZADO INGRESADOS PREVIAMENTE
+            --IF ( p_vIN_PRF_CARGO_SLC != '' OR p_vIN_PRF_CARGO_SLC IS NOT NULL ) THEN
+            UPDATE IDO_RRHH.RHTD_PERFIL_CARGO C
+            SET
+            C.IN_ESTADO = '0'
+            WHERE
+            C.NU_CONV = p_vIN_NUM_CONV AND
+            C.ANO_CONV = p_vIN_ANIO_CONV;
+            --END IF;
+
+            -- ELIMINAMOS LOS PERFILES DE NIVEL ALCANZADO INGRESADOS PREVIAMENTE
+            --IF ( p_vIN_PRF_ESP_SLC != '' OR p_vIN_PRF_ESP_SLC IS NOT NULL ) THEN
+            UPDATE IDO_RRHH.RHTD_PERFIL_ESPECIALIDAD D
+            SET
+            D.IN_ESTADO = '0'
+            WHERE
+            D.NU_CONV = p_vIN_NUM_CONV AND
+            D.ANO_CONV = p_vIN_ANIO_CONV;
+            --END IF ;
+
+            -- ELIMINAMOS LOS PERFILES DE NIVEL ALCANZADO INGRESADOS PREVIAMENTE
+            --IF ( p_vIN_PRF_TIP_ESP_SLC != '' OR p_vIN_PRF_TIP_ESP_SLC IS NOT NULL ) THEN
+            UPDATE IDO_RRHH.RHTD_PERFIL_TIPO_ESPECIALIZA E
+            SET
+            E.IN_ESTADO = '0'
+            WHERE
+            E.NU_CONV = p_vIN_NUM_CONV AND
+            E.ANO_CONV = p_vIN_ANIO_CONV;
+            --END IF;
+
+            -- ELIMINAMOS LOS PERFILES DE NIVEL ALCANZADO INGRESADOS PREVIAMENTE
+            --IF ( p_vIN_PRF_INSTI_SLC != '' OR p_vIN_PRF_INSTI_SLC IS NOT NULL ) THEN
+            UPDATE IDO_RRHH.RHTD_PERFIL_INSTITUCION F
+            SET
+            F.IN_ESTADO = '0'
+            WHERE
+            F.NU_CONV = p_vIN_NUM_CONV AND
+            F.ANO_CONV = p_vIN_ANIO_CONV;
+            --END IF ;
+
+            -- ACTUALIZAMOS EL ARCHIVO BLOB
+            UPDATE IDO_RRHH.RHTV_ARCHIVO_CONV T
+               SET
+               T.BL_BRC=(CASE WHEN p_blIN_PDF IS NOT NULL THEN p_blIN_PDF else v_blBL_BRC end),
+               --T.BL_BRC=p_blIN_PDF_ARCHIVO,
+               T.RUTA_BL_BRC = p_blIN_RUTA_PDF,
+               T.CO_TIPO = p_vIN_CO_TIPO,
+               T.US_UPDATE = p_vIN_US_MOD,
+               T.FE_UPDATE=SYSDATE
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV;
+
+
+
+            UPDATE IDO_RRHH.RHTM_CONVOCATORIA
+            SET
+                     DE_CONV = p_vIN_DESCRIP_CONV,
+                     CO_UUOO = p_vIN_CO_UUOO,
+                     CO_UBICACION = p_vIN_CO_UBICACION,
+                     FE_INI_CONV = p_dFE_INI_IN,
+                     FE_FIN_CONV = p_dFE_FIN_IN,
+                     IN_ESTADO = p_vIN_ESTADO,
+                     US_UPDATE = p_vIN_US_MOD,
+                     FE_UPDATE = SYSDATE,
+                     CO_ETAPA = p_nIN_COD_ETAPA,
+                     CO_TIPO = p_vIN_CO_TIPO,
+                     --SE_CONV = v_nNU_SECUENCIA,
+                     IN_COLEGIATURA = p_vIN_COLEGIATURA,
+                     CO_SUB_GERENCIA = p_vIN_CO_SUB_GERENCIA,
+                     DE_UUOO = p_vIN_DE_UUOO,
+                     DE_UBICACION = p_vIN_DE_UBICACION,
+                     CA_ANOS_EXP_GEN = p_nIN_CA_ANOS_EXP_GEN,
+                     CA_ANOS_EXP_ESP = p_nIN_CA_ANOS_EXP_ESP
+                     WHERE
+                     NU_CONV = p_vIN_NUM_CONV AND
+                     ANO_CONV = p_vIN_ANIO_CONV;
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV||'|'||'OK';
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := SQLCODE;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR||'|'||SQLERRM;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+/*
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LIST_TIPO_ARCHIVO_CONV(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_TIPO_ARCHIVO AS COD_TIPO_ARCHIVO,
+                   A.DE_TIPO_ARCHIVO AS DE_TIPO_ARCHIVO
+          FROM     IDO_RRHH.RHTM_TIPO_ARCHIVO A
+          WHERE
+          A.IN_ESTADO = '1' AND
+          A.IN_FASE = '2'
+          ORDER BY A.CO_TIPO_ARCHIVO ASC;
+     END;
+END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_NOMBRE_ARCHIVO(p_nIN_COD_ARCHIVO IN  VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+          A.DE_TIPO_ARCHIVO AS NOMBRE_ARCHIVO
+          FROM   IDO_RRHH.RHTM_TIPO_ARCHIVO A
+          WHERE  A.CO_TIPO_ARCHIVO=p_nIN_COD_ARCHIVO;
+     END;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_CARGAR_PDF_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                                       p_vIN_TIPO_DOC IN VARCHAR2,
+                                       p_crOUT_CURSOR_AA OUT SYS_REFCURSOR ) IS
+    BEGIN
+      BEGIN
+
+      IF ( p_vIN_TIPO_DOC = '1' ) THEN
+
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_BRC AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+      ELSIF  ( p_vIN_TIPO_DOC = '2' ) THEN
+               --BEGIN
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_LI AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+      ELSIF  ( p_vIN_TIPO_DOC = '3' ) THEN
+               --BEGIN
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_REC AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+      ELSIF  ( p_vIN_TIPO_DOC = '4' ) THEN
+               --BEGIN
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_RCV AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+      ELSIF  ( p_vIN_TIPO_DOC = '5' ) THEN
+               --BEGIN
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_REP AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+      ELSIF  ( p_vIN_TIPO_DOC = '6' ) THEN
+               --BEGIN
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_COM1 AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+
+      ELSIF  ( p_vIN_TIPO_DOC = '7' ) THEN
+               --BEGIN
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_COM2 AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+      ELSIF  ( p_vIN_TIPO_DOC = '8' ) THEN
+               --BEGIN
+             OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_CONV||'|'||A.ANO_CONV||'|'||A.CO_TIPO AS CODIGO_PRINCIPAL,
+             A.BL_COM1 AS PDF_BLOB
+             FROM IDO_RRHH.RHTV_ARCHIVO_CONV A
+             WHERE
+             A.NU_CONV=p_vIN_NUM_CONV
+             AND
+             A.ANO_CONV =p_vIN_ANIO_CONV;
+      ELSE
+              --RETURN '-1'||'|'||'NO EXISTE OPCION SELECCIONADA';
+              DBMS_OUTPUT.put_line('AAA');
+              END IF;
+
+    END;
+    END;
+
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : PROCEDURE QUE aCTUALIZA El ARCHIVO PDF DE ACTA DE APERTURA
+----------------------------------------------------------------------------------------------------
+FUNCTION SFFU_VALIDAR_PDF_ARCHIVO(p_vIN_NUM_CONV IN VARCHAR2,
+                                    p_vIN_ANIO_CONV IN VARCHAR2,
+                                    p_vIN_TIPO_CONV IN VARCHAR2)
+RETURN NUMBER IS
+                                    v_nNU_ERROR INTEGER;
+BEGIN
+      DECLARE
+      v_nEXISTE_LOTE NUMBER;
+      BEGIN
+      IF ( p_vIN_TIPO_CONV = '1' ) THEN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_BRC IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR ;
+      ELSIF  ( p_vIN_TIPO_CONV = '2' ) THEN
+               BEGIN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_LI IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               --v_vOUT_VALORES := '2';
+
+               END;
+               --v_vOUT_VALORES := '2';
+                RETURN v_nNU_ERROR ;
+      ELSIF  ( p_vIN_TIPO_CONV = '3' ) THEN
+               BEGIN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_REC IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               END;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR;
+      ELSIF  ( p_vIN_TIPO_CONV = '4' ) THEN
+               BEGIN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_RCV IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               END;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR;
+      ELSIF  ( p_vIN_TIPO_CONV = '5' ) THEN
+               BEGIN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_REP IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               END;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR;
+      ELSIF  ( p_vIN_TIPO_CONV = '6' ) THEN
+               BEGIN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_COM1 IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               END;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR;
+
+      ELSIF  ( p_vIN_TIPO_CONV = '7' ) THEN
+               BEGIN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_COM2 IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               END;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR;
+      ELSIF  ( p_vIN_TIPO_CONV = '8' ) THEN
+               BEGIN
+
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_COM3 IS NOT NULL;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               END;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR;
+      ELSE
+              RETURN -1;
+              END IF;
+      EXCEPTION
+                WHEN OTHERS THEN
+                     RETURN -2;
+      END;
+      END;
+   ----------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : Procedimiento que lista los valores a mostrar de la muestra generada para UO OAA
+----------------------------------------------------------------------------------------------------
+ PROCEDURE SFSP_VERIFICA_ARCHIVO(p_vIN_NUM_CONV IN VARCHAR2,
+                                    p_vIN_ANIO_CONV IN VARCHAR2,
+                                    p_crOUT_CURSOR_LISTA OUT SYS_REFCURSOR ) IS
+    Begin
+      DECLARE
+      v_nNU_ARCHIVO1        INTEGER:=0;
+      v_nNU_ARCHIVO2        INTEGER:=0;
+      v_nNU_ARCHIVO3        INTEGER:=0;
+      v_nNU_ARCHIVO4        INTEGER:=0;
+      v_nNU_ARCHIVO5        INTEGER:=0;
+      v_nNU_ARCHIVO6        INTEGER:=0;
+      v_nNU_ARCHIVO7        INTEGER:=0;
+      v_nNU_ARCHIVO8        INTEGER:=0;
+
+      BEGIN
+               SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO1
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_BRC IS NOT NULL;
+
+                SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO2
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_LI IS NOT NULL;
+
+
+               SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO3
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_REC IS NOT NULL;
+
+               SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO4
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_RCV IS NOT NULL;
+
+               SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO5
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_REP IS NOT NULL;
+
+
+               SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO6
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_COM1 IS NOT NULL;
+
+               SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO7
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_COM2 IS NOT NULL;
+
+               SELECT COUNT(1)
+               INTO v_nNU_ARCHIVO8
+               FROM IDO_RRHH.RHTV_ARCHIVO_CONV T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.RUTA_BL_COM3 IS NOT NULL;
+
+
+              OPEN p_crOUT_CURSOR_LISTA FOR
+
+                 SELECT
+                 v_nNU_ARCHIVO1 AS EXISTE_ARCHIVO_1,
+                 v_nNU_ARCHIVO2 AS EXISTE_ARCHIVO_2,
+                 v_nNU_ARCHIVO3 AS EXISTE_ARCHIVO_3,
+                 v_nNU_ARCHIVO4 AS EXISTE_ARCHIVO_4,
+                 v_nNU_ARCHIVO5 AS EXISTE_ARCHIVO_5,
+                 v_nNU_ARCHIVO6 AS EXISTE_ARCHIVO_6,
+                 v_nNU_ARCHIVO7 AS EXISTE_ARCHIVO_7,
+                 v_nNU_ARCHIVO8 AS EXISTE_ARCHIVO_8
+                 FROM DUAL;
+
+       End;
+  End;
+/*
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : PROCEDURE QUE aCTUALIZA El ARCHIVO PDF DE ACTA DE APERTURA
+----------------------------------------------------------------------------------------------------
+FUNCTION SFFU_EXISTE_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                  p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN NUMBER IS
+                                    v_nNU_ERROR INTEGER;
+BEGIN
+      DECLARE
+      v_nEXISTE_LOTE NUMBER;
+      BEGIN
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTM_CONVOCATORIA T
+               WHERE  T.NU_CONV = p_vIN_NUM_CONV
+               AND T.ANO_CONV = p_vIN_ANIO_CONV
+               AND T.IN_ESTADO = '1';
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR ;
+      EXCEPTION
+                WHEN OTHERS THEN
+                     RETURN -2;
+      END;
+      END;
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_ENTREGA_DOCUMENTO(
+                                 p_vIN_COD_VALIDACION IN VARCHAR2,
+                                 p_vIN_NUMERO_FICHA IN VARCHAR2,
+                                 p_vIN_ANIO_FICHA IN VARCHAR2,
+                                 p_dFE_ENTREGA IN DATE,
+                                 p_vIN_DE_OBSERVACION IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR      NUMBER := 0;
+             v_nNU_SECUENCIA  NUMBER := 0;
+             v_nNU_CONV       CHAR(5) := '';
+             v_nNU_ANO_CONV   CHAR(4) := '';
+             v_nCO_TIPO_CONV  CHAR(1) := '';
+     BEGIN
+
+
+            SELECT T.NU_CONV,T.ANO_CONV,T.CO_TIPO
+            INTO   v_nNU_CONV,v_nNU_ANO_CONV,v_nCO_TIPO_CONV
+            FROM   IDO_RRHH.RHTD_POSTULA_CONV T
+            WHERE
+            T.NU_FICHA=p_vIN_NUMERO_FICHA
+            AND T.ANO_FICHA=p_vIN_ANIO_FICHA;
+
+            INSERT INTO IDO_RRHH.RHTM_ENTREGA_DOCUMENTO (COD_VALIDACION,
+                                           NUMERO_FICHA,
+                                           ANO_FICHA,
+                                           FE_ENTREGA,
+                                           DE_OBSERVACION,
+                                           US_CREACION,
+                                           FE_CREACION,
+                                           IN_ESTADO,
+                                           NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           IN_ESTADO_DOCUMENTO)
+                                               VALUES (p_vIN_COD_VALIDACION,
+                                                      p_vIN_NUMERO_FICHA,
+                                                      p_vIN_ANIO_FICHA,
+                                                      p_dFE_ENTREGA,
+                                                      p_vIN_DE_OBSERVACION,
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE,
+                                                      '1',
+                                                      v_nNU_CONV,
+                                                      v_nNU_ANO_CONV,
+                                                      v_nCO_TIPO_CONV,
+                                                      '2');
+
+
+            v_nNU_ERROR := 1;--guardar codigo generado
+            v_vOUT_VALORES:=1; --COD_VALIDACION||'|'||NUMERO_FICHA;--||'|'||p_nIN_COD_TIPO_INST;
+
+            IF ( v_vOUT_VALORES = '1' ) THEN
+              UPDATE IDO_RRHH.RHTD_POSTULA_CONV
+              SET
+              IN_ESTADO='2'
+              WHERE
+              NU_FICHA=p_vIN_NUMERO_FICHA
+              AND
+              NU_DNI||NU_CONV||ANO_CONV||CO_TIPO = p_vIN_COD_VALIDACION;
+
+            END IF;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_ENTREGA_DOCUMENTO(p_cIN_ESP IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.COD_VALIDACION AS COD_VALIDACION,
+                   A.NUMERO_FICHA AS NUMERO_FICHA,
+                   TO_CHAR( A.FE_ENTREGA , 'DD/MM/YYYY') AS FECHA_ENTREGA_TXT,
+                   A.DE_OBSERVACION AS DE_OBSERVACION,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   DECODE(A.IN_ESTADO,'1','ACTIVO','0','INACTIVO')AS ESTADO,
+                   DECODE(A.IN_ESTADO_DOCUMENTO,'1','REGISTRADO','2','RECEPCIONADO','3','ASIGNADO')AS ESTADO_DOCUMENTO,
+                   A.ANO_FICHA AS ANIO_FICHA,
+                   ROWNUM AS FILA
+          FROM     IDO_RRHH.RHTM_ENTREGA_DOCUMENTO A WHERE A.IN_ESTADO=p_cIN_ESP
+          ORDER BY A.FE_ENTREGA DESC;
+     END;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : PROCEDURE QUE carga el pdf blob de un acta de apertura generada x Numero de Lote
+----------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_CARGAR_PDF_ENTREGA(p_nIN_COD_VALIDACION IN  VARCHAR2,
+                                   p_nIN_NUM_FICHA IN  VARCHAR2,
+                                   p_nIN_ANIO_FICHA IN  VARCHAR2,
+                                   p_crOUT_CURSOR_AA OUT SYS_REFCURSOR ) IS
+    BEGIN
+      BEGIN
+            OPEN p_crOUT_CURSOR_AA FOR
+             SELECT A.NU_DNI||A.NU_CONV||A.ANO_CONV||A.CO_TIPO AS CODIGO_VALIDACION,
+             A.NU_FICHA AS NUMERO_FICHA,
+             A.ANO_FICHA AS ANIO_FICHA,
+             A.PDF_FICHA AS PDF_BLOB
+             FROM IDO_RRHH.RHTD_POSTULA_CONV A
+             WHERE A.NU_FICHA=p_nIN_NUM_FICHA
+             AND  A.NU_DNI||A.NU_CONV||A.ANO_CONV||A.CO_TIPO =p_nIN_COD_VALIDACION
+             AND A.ANO_FICHA = p_nIN_ANIO_FICHA;
+    END;
+    END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : PROCEDURE QUE VERIFICA SI EXISTE FICHA DE POSTULANTE
+----------------------------------------------------------------------------------------------------
+FUNCTION SFFU_EXISTE_POSTULANTE(p_nIN_COD_VALIDACION IN  VARCHAR2,
+                                   p_nIN_NUM_FICHA IN  VARCHAR2,
+                                   p_nIN_ANIO_FICHA IN  VARCHAR2)
+RETURN NUMBER IS
+                                    v_nNU_ERROR INTEGER;
+BEGIN
+      DECLARE
+      v_nEXISTE_LOTE NUMBER;
+      BEGIN
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTD_POSTULA_CONV A
+               WHERE A.NU_FICHA=p_nIN_NUM_FICHA
+               AND  A.NU_DNI||A.NU_CONV||A.ANO_CONV||A.CO_TIPO =p_nIN_COD_VALIDACION
+               AND A.ANO_FICHA=p_nIN_ANIO_FICHA;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR ;
+      EXCEPTION
+                WHEN OTHERS THEN
+                     RETURN -2;
+      END;
+      END;
+----------------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : PROCEDURE QUE VERIFICA SI EXISTE REGISTRO DE ENTREGA
+----------------------------------------------------------------------------------------------------
+
+ FUNCTION SFFU_EXISTE_REGISTRO_ENTREGA(p_nIN_COD_VALIDACION IN  VARCHAR2,
+                                   p_nIN_NUM_FICHA IN  VARCHAR2,
+                                   p_nIN_ANIO_FICHA IN  VARCHAR2)
+ RETURN NUMBER IS
+                                    v_nNU_ERROR INTEGER;
+ BEGIN
+      DECLARE
+      v_nEXISTE_LOTE NUMBER;
+      BEGIN
+               SELECT COUNT(1)
+               INTO v_nEXISTE_LOTE
+               FROM IDO_RRHH.RHTM_ENTREGA_DOCUMENTO A
+               WHERE A.NUMERO_FICHA=p_nIN_NUM_FICHA
+               AND  A.COD_VALIDACION =p_nIN_COD_VALIDACION
+               AND A.ANO_FICHA=p_nIN_ANIO_FICHA;
+               v_nNU_ERROR :=v_nEXISTE_LOTE;
+               --v_vOUT_VALORES := '2';
+               RETURN v_nNU_ERROR ;
+      EXCEPTION
+                WHEN OTHERS THEN
+                     RETURN -2;
+      END;
+      END;
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    : Funcion que inserta un registro en la tabla contenido del medio portador
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_ASISTENTE(p_vIN_CO_ASISTENTE IN VARCHAR2,
+                              p_vIN_NOM_ASISTENTE IN VARCHAR2,
+                              p_vIN_PERFIL IN VARCHAR2,
+                              p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+             v_vOUT_FEC_REG  VARCHAR2(10):= '';
+             v_vCODIGO_GENERADO VARCHAR2(10):= '';
+     BEGIN
+
+
+            INSERT INTO IDO_RRHH.RHTM_ASISTENTE (CO_ASISTENTE,
+                                                NOM_ASISTENTE,
+                                           IN_PERFIL,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION)
+                                               VALUES (p_vIN_CO_ASISTENTE,
+                                                      p_vIN_NOM_ASISTENTE,
+                                                      p_vIN_PERFIL,
+                                                      '1',--Estado: 1 activo 0 inactivo
+                                                       p_vIN_US_CREA,
+                                                       SYSDATE);
+
+            v_vOUT_VALORES:= '1';
+
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_FEC_REG:= '00/00/0000';--coloca una fecha por defecto
+                 v_vCODIGO_GENERADO:='0000000000';
+                 --v_vOUT_VALORES:= v_nNU_ERROR||'|'||v_vOUT_FEC_REG||'|'||v_vCODIGO_GENERADO;
+                 v_vOUT_VALORES:= '2';
+      END;
+            RETURN v_vOUT_VALORES;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    : Procedure que lista los registros de la tabla contenido del medio portador
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_ASISTENTE(p_cIN_ASIST IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT   A.CO_ASISTENTE AS CODIGO_ASISTENTE,
+                   A.NOM_ASISTENTE AS NOMBRE_EMPLEADO,
+                   A.IN_PERFIL AS COD_PERFIL,
+                   DECODE(A.IN_PERFIL,'1','OPERADOR','2','ADMINISTRADOR')AS PERFIL,
+                   TO_CHAR(A.FE_CREACION, 'DD/MM/YYYY') AS FECHA_CREACION_TXT,
+                   A.US_CREACION AS USUARIO_REGISTRO,
+                   A.IN_ESTADO AS COD_ESTADO,
+                   DECODE(A.IN_ESTADO,'1','ACTIVO','0','DESACTIVO')AS ESTADO,
+                   ROWNUM AS FILA
+          FROM     IDO_RRHH.RHTM_ASISTENTE A WHERE A.IN_ESTADO=p_cIN_ASIST
+          ORDER BY A.CO_ASISTENTE ASC;
+     END;
+END;
+
+--------------------------------------------------------------------------------------------------------
+-- Autor          : Luis Ortega
+-- Descripción    : PROCEDURE QUE VERIFICA SI EXISTE FICHA DE POSTULANTE
+----------------------------------------------------------------------------------------------------
+FUNCTION SFFU_BUSCA_EMPLEADO(p_nIN_COD_EMPLEADO IN  VARCHAR2)
+RETURN VARCHAR2 IS
+                                    v_nNU_RESULTADO VARCHAR2(100);
+BEGIN
+      DECLARE
+      v_nNOMBRE_EMPLEADO VARCHAR2(100);
+      BEGIN
+               SELECT
+                E.CEMP_APEPAT||' '||E.CEMP_APEMAT||', '||E.CEMP_DENOM
+                INTO v_nNOMBRE_EMPLEADO
+                FROM IDO_RRHH.RHTM_PER_EMPLEADOS E
+                WHERE E.CEMP_EST_EMP = '1'
+                AND E.CEMP_CODEMP=p_nIN_COD_EMPLEADO;
+                v_nNU_RESULTADO:=v_nNOMBRE_EMPLEADO;
+               RETURN v_nNU_RESULTADO ;
+      EXCEPTION
+                WHEN OTHERS THEN
+                     RETURN '';
+      END;
+      END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    : Procedure que busca un registro de la tabla contenido del medio portador por su
+--                  codigo primario
+--------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FIND_ASISTENTE(p_nIN_CO_ASISTENTE IN  VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                 A.CO_ASISTENTE AS CODIGO_ASISTENTE,
+                 A.NOM_ASISTENTE AS NOMBRE_ASISTENTE,
+                 A.IN_PERFIL AS CODIGO_PERFIL
+
+          FROM   IDO_RRHH.RHTM_ASISTENTE A
+          WHERE  A.CO_ASISTENTE=p_nIN_CO_ASISTENTE
+          AND    A.IN_ESTADO='1';
+     END;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    : Función que actualiza un registro de la tabla contenido del medio portador
+------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_UPDT_ASISTENTE(p_vIN_CO_ASISTENTE IN VARCHAR2,
+                              p_vIN_NOM_ASISTENTE IN VARCHAR2,
+                              p_vIN_PERFIL IN VARCHAR2,
+                              p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                                v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_ASISTENTE
+          SET
+                 NOM_ASISTENTE = p_vIN_NOM_ASISTENTE,
+                 IN_PERFIL = p_vIN_PERFIL,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_ASISTENTE=p_vIN_CO_ASISTENTE;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+                    WHEN NO_DATA_FOUND THEN
+                         v_nNU_ERROR := 0;
+                    WHEN OTHERS THEN
+                         v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+--------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    : Función que elimina logicamente un registro de la tabla contenido del medio portador
+--------------------------------------------------------------------------------------------------------
+FUNCTION SFFU_DELETE_ASISTENTE(p_vIN_CO_ASISTENTE IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER IS
+                               v_nNU_ERROR INTEGER;
+BEGIN
+     BEGIN
+          UPDATE IDO_RRHH.RHTM_ASISTENTE
+          SET    IN_ESTADO= 0,
+                 FE_UPDATE=SYSDATE,
+                 US_UPDATE=p_vIN_US_MOD
+          WHERE  CO_ASISTENTE=p_vIN_CO_ASISTENTE;
+          v_nNU_ERROR := 1;
+          EXCEPTION
+          WHEN NO_DATA_FOUND THEN
+               v_nNU_ERROR := 0;
+          WHEN OTHERS THEN
+               v_nNU_ERROR := -1;
+     END;
+         RETURN v_nNU_ERROR;
+END;
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis ortega
+-- Descripción    : PROCEDURE QUE ENLISTA LAS CONVOCATORIAS
+----------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FILTRO_CONV_ANIO_NUMERO(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                                       p_nIN_COD_ETAPA IN  INTEGER,
+                                       p_vIN_CO_TIPO IN VARCHAR2,
+                                  p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR) IS
+BEGIN
+     DECLARE
+             v_vQUERY VARCHAR2(3000);
+             v_vCONDICION VARCHAR2(1000):='';
+             v_vCONDICION2 VARCHAR2(100):=' ORDER BY T.NU_CONV DESC,T.ANO_CONV DESC';
+     BEGIN
+           v_vQUERY := 'SELECT
+                        T.NU_CONV AS NUMERO_CONVOCATORIA,
+                        T.ANO_CONV AS ANIO_CONVOCATORIA,
+                        T.DE_CONV AS DESCRIPCION_CONVOCATORIA,
+                        TO_CHAR(T.FE_INI_CONV, ''DD/MM/YYYY'') AS FECHA_INICIO_CONVOCATORIA_TXT,
+                        TO_CHAR(T.FE_FIN_CONV, ''DD/MM/YYYY'') AS FECHA_FIN_CONVOCATORIA_TXT,
+                        A.DE_TIPO AS TIPO_CONVOCATORIA,
+                        A.CO_TIPO AS CO_TIPO_CONVOCATORIA,
+                        B.DE_ETAPA AS ETAPA_CONVOCATORIA,
+                        DECODE((SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X
+                        WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV)
+                        ,1,''ASIGNADO'',
+                        0,''SIN ASIGNAR'')AS DESCRIP_ASIGNADO,
+                        (SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV) AS CANTIDAD_ASIGNADO,
+                        DECODE(T.IN_ESTADO,''1'',''ACTIVO'',''0'',''INACTIVO'') AS ESTADO_CONVOCATORIA,
+                        TO_CHAR(T.FE_CREACION, ''DD/MM/YYYY'') AS FECHA_REGISTRO_TXT,
+                        T.US_CREACION AS USUARIO_REGISTRO,
+                        T.IN_ESTADO AS ESTADO
+                   FROM
+                        IDO_RRHH.RHTM_CONVOCATORIA T,
+                        IDO_RRHH.RHTR_TIPO_CONV A ,
+                        IDO_RRHH.RHTR_ETAPA_CONV B
+                   WHERE
+                        T.CO_TIPO = A.CO_TIPO
+                        AND T.CO_ETAPA = B.CO_ETAPA
+                        ';
+
+           IF p_vIN_NUM_CONV IS NOT NULL THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_vIN_NUM_CONV ');
+             v_vCONDICION:=v_vCONDICION||' AND T.NU_CONV='||p_vIN_NUM_CONV;
+           END IF;
+
+           IF p_vIN_ANIO_CONV IS NOT NULL THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_vIN_ANIO_CONV ');
+             v_vCONDICION:=v_vCONDICION||' AND T.ANO_CONV='||p_vIN_ANIO_CONV;
+           END IF;
+
+           IF p_nIN_COD_ETAPA >0 THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_nIN_COD_ETAPA ');
+             v_vCONDICION:=v_vCONDICION||' AND T.CO_ETAPA='||p_nIN_COD_ETAPA;
+           END IF;
+
+           IF p_vIN_CO_TIPO !='0' THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_vIN_CO_TIPO ');
+             v_vCONDICION:=v_vCONDICION||' AND T.CO_TIPO='||p_vIN_CO_TIPO;
+           END IF;
+
+             v_vQUERY:=v_vQUERY||v_vCONDICION||v_vCONDICION2;
+
+          OPEN  p_crCURSOR_PRINCIPAL FOR v_vQUERY;
+          END;
+END;
+
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis ortega
+-- Descripción    : PROCEDURE QUE ENLISTA LAS CONVOCATORIAS
+----------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FILTRO_CONV_FECHAS(p_dFE_INI_IN IN DATE,
+                                       p_dFE_FIN_IN IN DATE,
+                                       p_nIN_COD_ETAPA IN  INTEGER,
+                                       p_vIN_CO_TIPO IN VARCHAR2,
+                                  p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR) IS
+BEGIN
+     DECLARE
+             v_vQUERY VARCHAR2(3000);
+             v_vCONDICION VARCHAR2(1000):='';
+             v_vCONDICION2 VARCHAR2(100):=' ORDER BY T.NU_CONV DESC,T.ANO_CONV DESC';
+     BEGIN
+           v_vQUERY := 'SELECT
+                        T.NU_CONV AS NUMERO_CONVOCATORIA,
+                        T.ANO_CONV AS ANIO_CONVOCATORIA,
+                        T.DE_CONV AS DESCRIPCION_CONVOCATORIA,
+                        TO_CHAR(T.FE_INI_CONV, ''DD/MM/YYYY'') AS FECHA_INICIO_CONVOCATORIA_TXT,
+                        TO_CHAR(T.FE_FIN_CONV, ''DD/MM/YYYY'') AS FECHA_FIN_CONVOCATORIA_TXT,
+                        A.DE_TIPO AS TIPO_CONVOCATORIA,
+                        A.CO_TIPO AS CO_TIPO_CONVOCATORIA,
+                        B.DE_ETAPA AS ETAPA_CONVOCATORIA,
+                        DECODE((SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X
+                        WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV)
+                        ,1,''ASIGNADO'',
+                        0,''SIN ASIGNAR'')AS DESCRIP_ASIGNADO,
+                        (SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV) AS CANTIDAD_ASIGNADO,
+                        DECODE(T.IN_ESTADO,''1'',''ACTIVO'',''0'',''INACTIVO'') AS ESTADO_CONVOCATORIA,
+                        TO_CHAR(T.FE_CREACION, ''DD/MM/YYYY'') AS FECHA_REGISTRO_TXT,
+                        T.US_CREACION AS USUARIO_REGISTRO,
+                        T.IN_ESTADO AS ESTADO
+                   FROM
+                        IDO_RRHH.RHTM_CONVOCATORIA T,
+                        IDO_RRHH.RHTR_TIPO_CONV A ,
+                        IDO_RRHH.RHTR_ETAPA_CONV B
+                   WHERE
+                        T.CO_TIPO = A.CO_TIPO
+                        AND T.CO_ETAPA = B.CO_ETAPA
+                        AND T.FE_FIN_CONV >='''||p_dFE_INI_IN||
+                        ''' AND T.FE_FIN_CONV <='''||p_dFE_FIN_IN||'''';
+
+           IF p_nIN_COD_ETAPA >0 THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_nIN_COD_ETAPA ');
+             v_vCONDICION:=v_vCONDICION||' AND T.CO_ETAPA='||p_nIN_COD_ETAPA;
+           END IF;
+
+           IF p_vIN_CO_TIPO !='0' THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_vIN_CO_TIPO ');
+             v_vCONDICION:=v_vCONDICION||' AND T.CO_TIPO='||p_vIN_CO_TIPO;
+           END IF;
+
+             v_vQUERY:=v_vQUERY||v_vCONDICION||v_vCONDICION2;
+
+          OPEN  p_crCURSOR_PRINCIPAL FOR v_vQUERY;
+          END;
+END;
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LISTADO_FILT_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                        T.NU_CONV AS NUMERO_CONVOCATORIA,
+                        T.ANO_CONV AS ANIO_CONVOCATORIA,
+                        T.DE_CONV AS DESCRIPCION_CONVOCATORIA,
+                        TO_CHAR(T.FE_INI_CONV, 'DD/MM/YYYY') AS FECHA_INICIO_CONVOCATORIA_TXT,
+                        TO_CHAR(T.FE_FIN_CONV, 'DD/MM/YYYY') AS FECHA_FIN_CONVOCATORIA_TXT,
+                        A.DE_TIPO AS TIPO_CONVOCATORIA,
+                        A.CO_TIPO AS CO_TIPO_CONVOCATORIA,
+                        B.DE_ETAPA AS ETAPA_CONVOCATORIA,
+                        DECODE((SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X
+                        WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV)
+                        ,1,'ASIGNADO',
+                        0,'SIN ASIGNAR')AS DESCRIP_ASIGNADO,
+                        (SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV) AS CANTIDAD_ASIGNADO,
+                        DECODE(T.IN_ESTADO,'1','ACTIVO','0','INACTIVO') AS ESTADO_CONVOCATORIA,
+                        TO_CHAR(T.FE_CREACION, 'DD/MM/YYYY') AS FECHA_REGISTRO_TXT,
+                        T.US_CREACION AS USUARIO_REGISTRO,
+                        T.IN_ESTADO AS ESTADO
+                   FROM
+                        IDO_RRHH.RHTM_CONVOCATORIA T,
+                        IDO_RRHH.RHTR_TIPO_CONV A ,
+                        IDO_RRHH.RHTR_ETAPA_CONV B
+                   WHERE
+                        T.CO_TIPO = A.CO_TIPO
+                        AND T.CO_ETAPA = B.CO_ETAPA
+                        ORDER BY T.NU_CONV DESC,T.ANO_CONV DESC;
+     END;
+END;
+
+------------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    : Procedure que lista los registros de la tabla contenido del medio portador
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_COMBO_ASISTENTE(p_cIN_ASIST IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+
+          SELECT   A.CO_ASISTENTE AS CODIGO_ASISTENTE,
+          A.NOM_ASISTENTE||' --- '||DECODE(A.IN_PERFIL,'1','OPERADOR','2','ADMINISTRADOR') AS NOM_PERFIL_ASISTENTE
+          FROM     IDO_RRHH.RHTM_ASISTENTE A WHERE A.IN_ESTADO='1'
+                   AND NOT EXISTS(SELECT 1 FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X
+                   WHERE X.CO_ASISTENTE=A.CO_ASISTENTE AND X.IN_ESTADO='1')
+                   ORDER BY A.CO_ASISTENTE ASC;
+     END;
+END;
+----------------------------------------------------------------------------------------------------
+-- Autor          : LUIS ORTEGA
+-- Descripción    :
+----------------------------------------------------------------------------------------------------
+FUNCTION  SFFU_INSR_ASIG_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_CO_ASISTENTE IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2 IS
+                                 v_vOUT_VALORES VARCHAR2(30);
+BEGIN
+     DECLARE
+             v_nNU_ERROR  NUMBER := 0;
+     BEGIN
+
+
+            INSERT INTO IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA (NU_CONV,
+                                           ANO_CONV,
+                                           CO_TIPO,
+                                           CO_ASISTENTE,
+                                           IN_ESTADO,
+                                           US_CREACION,
+                                           FE_CREACION)
+                                               VALUES (p_vIN_NUM_CONV,
+                                                      p_vIN_ANIO_CONV,
+                                                      p_vIN_CO_TIPO,
+                                                      p_vIN_CO_ASISTENTE,
+                                                      '1',
+                                                      p_vIN_US_CREA,
+                                                      SYSDATE);
+
+
+            v_nNU_ERROR := '1';--guardar codigo generado
+            v_vOUT_VALORES:= p_vIN_NUM_CONV||'|'||p_vIN_ANIO_CONV;
+            EXCEPTION
+            WHEN OTHERS THEN
+                 v_nNU_ERROR := -1;--coloca -1 si hay errores
+                 v_vOUT_VALORES:= 2||'|'||v_nNU_ERROR;
+      END;
+            RETURN v_vOUT_VALORES;
+END;*/
+------------------------------------------------------------------------------------------------------
+-- Autor          : Ricardo Gutiérrez
+-- Descripción    : Procedure que lista los registros de la tabla contenido del medio portador
+------------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_LIST_ESPECIALIDAD_XCONV(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) IS
+BEGIN
+     BEGIN
+          OPEN p_crCURSOR_PRINCIPAL FOR
+          SELECT
+                   ROWNUM AS FILA,
+                   A.CO_ESPECIALIDAD AS CODIGO_ESPECIALIDAD,
+                   B.DE_ESPECIALIDAD AS DESCRIPCION_ESPECIALIDAD,
+                   B.US_CREACION AS USUARIO_CREACION,
+                   TO_CHAR(B.FE_CREACION,'DD/MM/YYYY') AS FECHA_CREACION
+
+          FROM
+                   RHTD_PERFIL_ESPECIALIDAD A,
+                   RHTM_ESPECIALIDAD B
+                   WHERE
+                   A.CO_ESPECIALIDAD=B.CO_ESPECIALIDAD
+                   AND
+                   A.NU_CONV=p_vIN_NUM_CONV
+                   AND
+                   A.ANO_CONV=p_vIN_ANIO_CONV
+          ORDER BY A.CO_ESPECIALIDAD ASC;
+     END;
+END;
+----------------------------------------------------------------------------------------------------
+-- Autor          : Luis ortega
+-- Descripción    : PROCEDURE QUE ENLISTA LAS CONVOCATORIAS
+----------------------------------------------------------------------------------------------------
+PROCEDURE SFSP_FILTRO_CONV_ANIO_NUMERO(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                                       p_nIN_COD_ETAPA IN  INTEGER,
+                                       p_vIN_CO_TIPO IN VARCHAR2,
+                                  p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR) IS
+BEGIN
+     DECLARE
+             v_vQUERY VARCHAR2(3000);
+             v_vCONDICION VARCHAR2(1000):='';
+             v_vCONDICION2 VARCHAR2(100):=' ORDER BY T.NU_CONV DESC,T.ANO_CONV DESC';
+     BEGIN
+           v_vQUERY := 'SELECT
+                        T.NU_CONV AS NUMERO_CONVOCATORIA,
+                        T.ANO_CONV AS ANIO_CONVOCATORIA,
+                        T.DE_CONV AS DESCRIPCION_CONVOCATORIA,
+                        TO_CHAR(T.FE_INI_CONV, ''DD/MM/YYYY'') AS FECHA_INICIO_CONVOCATORIA_TXT,
+                        TO_CHAR(T.FE_FIN_CONV, ''DD/MM/YYYY'') AS FECHA_FIN_CONVOCATORIA_TXT,
+                        A.DE_TIPO AS TIPO_CONVOCATORIA,
+                        A.CO_TIPO AS CO_TIPO_CONVOCATORIA,
+                        B.DE_ETAPA AS ETAPA_CONVOCATORIA,
+                        DECODE((SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X
+                        WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV)
+                        ,1,''ASIGNADO'',
+                        0,''SIN ASIGNAR'')AS DESCRIP_ASIGNADO,
+                        (SELECT COUNT(1) FROM IDO_RRHH.RHTD_ASIGNA_CONVOCATORIA X WHERE X.NU_CONV=T.NU_CONV AND X.ANO_CONV=T.ANO_CONV) AS CANTIDAD_ASIGNADO,
+                        DECODE(T.IN_ESTADO,''1'',''ACTIVO'',''0'',''INACTIVO'') AS ESTADO_CONVOCATORIA,
+                        TO_CHAR(T.FE_CREACION, ''DD/MM/YYYY'') AS FECHA_REGISTRO_TXT,
+                        T.US_CREACION AS USUARIO_REGISTRO,
+                        T.IN_ESTADO AS ESTADO
+                   FROM
+                        IDO_RRHH.RHTM_CONVOCATORIA T,
+                        IDO_RRHH.RHTR_TIPO_CONV A ,
+                        IDO_RRHH.RHTR_ETAPA_CONV B
+                   WHERE
+                        T.CO_TIPO = A.CO_TIPO
+                        AND T.CO_ETAPA = B.CO_ETAPA
+                        ';
+
+           IF p_vIN_NUM_CONV IS NOT NULL THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_vIN_NUM_CONV ');
+             v_vCONDICION:=v_vCONDICION||' AND T.NU_CONV='||p_vIN_NUM_CONV;
+           END IF;
+
+           IF p_vIN_ANIO_CONV IS NOT NULL THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_vIN_ANIO_CONV ');
+             v_vCONDICION:=v_vCONDICION||' AND T.ANO_CONV='||p_vIN_ANIO_CONV;
+           END IF;
+
+           IF p_nIN_COD_ETAPA >0 THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_nIN_COD_ETAPA ');
+             v_vCONDICION:=v_vCONDICION||' AND T.CO_ETAPA='||p_nIN_COD_ETAPA;
+           END IF;
+
+           IF p_vIN_CO_TIPO !='0' THEN--calidad de medio portador
+             DBMS_OUTPUT.put_line('DENTRO DE CONDICIONAL p_vIN_CO_TIPO ');
+             v_vCONDICION:=v_vCONDICION||' AND T.CO_TIPO='||p_vIN_CO_TIPO;
+           END IF;
+
+             v_vQUERY:=v_vQUERY||v_vCONDICION||v_vCONDICION2;
+
+          OPEN  p_crCURSOR_PRINCIPAL FOR v_vQUERY;
+          END;
+END;
+END RHPK_CONVOCATORIAS;

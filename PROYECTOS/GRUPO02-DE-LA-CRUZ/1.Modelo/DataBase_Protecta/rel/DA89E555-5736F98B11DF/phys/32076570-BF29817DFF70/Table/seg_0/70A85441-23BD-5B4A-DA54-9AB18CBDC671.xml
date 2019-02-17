@@ -1,0 +1,64 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="PV_BRAND_AUTO" directorySegmentName="seg_0" id="70A85441-23BD-5B4A-DA54-9AB18CBDC671">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>8BC85ACE-242E-B435-414E-13CB1AF84EF3</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="DEFFECDATE" id="4663C595-77AF-F197-7567-68CEF0DD2702">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NVEHBRAND" id="5AFE8ED7-DA37-427C-707B-0EF6738A4FBA">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DCOMPDATE" id="C4D941A1-FD39-4E1D-142B-409784809D1F">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SDESCRIPT" id="DE85D73E-DB3B-1E3B-675F-0A78A1EC7F00">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SSTATREGT" id="F2317745-265D-86B1-4C7B-CC6A770A4DE3">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="PV_BRAND_AUTO_PK" id="F31EC6C2-69E2-9133-0282-B627E859622B">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+</IndexProxy>
+</indexProxies>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="PV_BRAND_AUTO_PK" id="CCB45448-D8CA-7A70-D0FA-DB54775AAAF1">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<existingIndex>F31EC6C2-69E2-9133-0282-B627E859622B</existingIndex>
+<indexSegment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

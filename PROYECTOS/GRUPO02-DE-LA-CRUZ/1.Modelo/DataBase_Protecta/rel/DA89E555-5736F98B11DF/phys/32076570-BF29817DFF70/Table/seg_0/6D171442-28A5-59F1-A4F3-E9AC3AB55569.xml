@@ -1,0 +1,101 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev11g class="oracle.dbtools.crest.model.design.storage.oracle.v11g.TableProxyOraclev11g" name="ADDRESS" directorySegmentName="seg_0" id="6D171442-28A5-59F1-A4F3-E9AC3AB55569">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<segment>8BC85ACE-242E-B435-414E-13CB1AF84EF3</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="SE_MAIL" id="095C0EC9-BFA9-CAC6-E4FE-AA26AF913E63">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SSTREET" id="3E1B6A12-E7E7-3260-CBE8-6CD91CEB9375">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NPROVINCE" id="4839BA71-6F59-4FB9-BE20-AB9E5B408BEB">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SCLIENT" id="52E48A8A-B2A6-490D-3943-94354F25FC3D">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SKEYADDRESS" id="53EDBFA4-6E71-EAD0-430F-1B6C9A029889">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SSTREET1" id="7B35B344-B0C1-9958-43AC-7B59D8481236">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SDESCADD" id="B8F6F32B-BE22-F2D3-ACA1-A8FF49507221">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="DCOMPDATE" id="D2E4627C-1FC2-20BE-EAFA-D565C4D21ACE">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NMUNICIPALITY" id="E2E2F0B9-C107-9548-BA14-4B5DB8413FD1">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NLOCAL" id="F05F7ACD-FCF6-454C-4726-F0282AFBF24B">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="SREFERENCE" id="F8E41065-0A0D-EA17-B437-CF26CD1A1FFB">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="ADDRESS_PK" id="7ABE37BB-28FB-C812-9432-13261B199A16">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<schemaObject>06795D3D-E570-7EDF-F596-F2C206CF6375</schemaObject>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="ADDRESS_FK" id="AF7A6F5A-C483-7831-7938-EDA64EB9D2D6">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="ADDRESS_PK" id="1AAEEC48-A548-7FB1-FA36-00AEBD4E330A">
+<createdBy>Juan</createdBy>
+<createdTime>2019-02-17 04:36:36 UTC</createdTime>
+<ownerDesignName>DataBase_Protecta</ownerDesignName>
+<segment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</segment>
+<tableSpace>6FA2BB31-A0B6-9C53-B206-208C8AEC16A9</tableSpace>
+<existingIndex>7ABE37BB-28FB-C812-9432-13261B199A16</existingIndex>
+<indexSegment>26932DA1-CAA1-9B40-1CE0-64BBDE47EC2D</indexSegment>
+<indexSort>SORTED</indexSort>
+<usingIndex>BY INDEX NAME</usingIndex>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev11g>

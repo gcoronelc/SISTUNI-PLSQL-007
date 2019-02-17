@@ -1,0 +1,410 @@
+create or replace package RHPK_CONVOCATORIAS is
+
+  -- Author  : GTORRESV
+  -- Created : 02/10/2018 08:33:02 a.m.
+  -- Purpose : Almacenar los Procedimientos Almacenados del Sistema de Convocatorias de RRHH
+
+FUNCTION  SFFU_INSR_ESPECIALIDAD(p_vIN_DESCRIP_ESPECIALIDAD IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_LISTADO_ESPECIALIDAD(p_cIN_ESP IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+PROCEDURE SFSP_FIND_ESPECIALIDAD(p_nIN_COD_ESP IN  INTEGER,
+     p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_UPDT_ESPECIALIDAD(p_nIN_COD_ESP IN  INTEGER,
+                                p_vIN_DE_ESPECIALIDAD IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION SFFU_DELETE_ESPECIALIDAD(p_nIN_COD_ESP IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION  SFFU_INSR_NIVEL_ESTUDIOS(p_vIN_DESCRIP_NIVEL_ESTUDIOS IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+PROCEDURE SFSP_LISTADO_NIVEL_ESTUDIOS(p_cIN_NEST IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+PROCEDURE SFSP_FIND_NIVEL_ESTUDIOS(p_nIN_COD_NEST IN  INTEGER,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+FUNCTION SFFU_UPDT_NIVEL_ESTUDIOS(p_nIN_COD_NEST IN  INTEGER,
+                                p_vIN_DE_NIVEL_ESTUDIOS IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+FUNCTION SFFU_DELETE_NIVEL_ESTUDIOS(p_nIN_COD_NEST IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+FUNCTION  SFFU_INSR_TIPO_INST_ACAD(p_vIN_DESCRIP_INST_ACAD IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_LISTADO_TIPO_INST_ACAD(p_cIN_TIA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+PROCEDURE SFSP_FIND_TIPO_INST_ACAD(p_nIN_COD_TIA IN  INTEGER,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_UPDT_TIPO_INST_ACAD(p_nIN_COD_TIA IN  INTEGER,
+                                p_vIN_DE_TIPO_INST_ACAD IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION SFFU_DELETE_TIPO_INST_ACAD(p_nIN_COD_TIA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+PROCEDURE SFSP_COMBO_NIVEL_ESTUDIOS( p_crOUT_CURSOR_LISTA OUT SYS_REFCURSOR );
+
+FUNCTION  SFFU_INSR_NIVEL_ALCANZADO(p_nIN_COD_NEST IN  INTEGER,
+                                 p_vIN_DE_NIVEL_ALCANZADO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_LISTADO_NIVEL_ALCANZADO(p_cIN_NIVA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+PROCEDURE SFSP_FIND_NIVEL_ALCANZADO(p_nIN_COD_NIVA IN  INTEGER,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+FUNCTION SFFU_UPDT_NIVEL_ALCANZADO(p_nIN_COD_NIVA IN  INTEGER,
+                                p_nIN_COD_NEST IN  INTEGER,
+                                p_vIN_DE_NIVEL_ALCANZADO IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION SFFU_DELETE_NIVEL_ALCANZADO(p_nIN_COD_NIVA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+PROCEDURE SFSP_COMBO_TIPO_INST_ACAD( p_crOUT_CURSOR_LISTA OUT SYS_REFCURSOR );
+PROCEDURE SFSP_LISTADO_INST_ACAD(p_cIN_IA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION  SFFU_INSR_INST_ACADEMICA(p_nIN_COD_IA IN  INTEGER,
+     p_vIN_DE_INST_ACAD IN VARCHAR2,
+     p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+PROCEDURE SFSP_FIND_INSTITUCION_ACAD(p_nIN_COD_IA IN  INTEGER,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+FUNCTION SFFU_UPDT_INST_ACADEMICA(p_nIN_COD_IA IN  INTEGER,
+                                p_nIN_COD_TIA IN  INTEGER,
+                                p_vIN_DE_INST_ACADEMICA IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+FUNCTION SFFU_DELETE_INST_ACADEMICA(p_nIN_COD_IA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION  SFFU_INSR_AREA(p_vIN_DESCRIP_AREA IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+PROCEDURE SFSP_LISTADO_AREA(p_cIN_AREA IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+PROCEDURE SFSP_FIND_AREA(p_nIN_COD_AREA IN  INTEGER,
+     p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+FUNCTION SFFU_UPDT_AREA(p_nIN_COD_AREA IN  INTEGER,
+                                p_vIN_DE_AREA IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+FUNCTION SFFU_DELETE_AREA(p_nIN_COD_AREA IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION  SFFU_INSR_CARGO(p_vIN_DESCRIP_CARGO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+PROCEDURE SFSP_LISTADO_CARGO(p_cIN_CARGO IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+PROCEDURE SFSP_FIND_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+     p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_UPDT_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+                                p_vIN_DE_CARGO IN VARCHAR2,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+FUNCTION SFFU_DELETE_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION  SFFU_INSR_TIPO_ESPECIALIZACION(p_vIN_DESCRIP_TIP_ESP IN VARCHAR2,
+                                         p_nIN_HORAS_CON_ER IN  INTEGER,
+                                         p_nIN_HORAS_SIN_ER IN  INTEGER,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_LISTADO_TIP_ESP(p_cIN_TIP_ESP IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+PROCEDURE SFSP_FIND_TIPO_ESPECIALIZACION(p_nIN_COD_TIP_ESP IN  INTEGER,
+     p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_UPDT_TIPO_ESPECIALIZACION(p_nIN_COD_TIP_ESP IN  INTEGER,
+                                p_vIN_DE_TIP_ESP IN VARCHAR2,
+                                p_nIN_CA_HORAS_CON_ER IN  INTEGER,
+                                p_nIN_CA_HORAS_SIN_ER IN  INTEGER,
+                                p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION SFFU_DELETE_TIPO_ESP(p_nIN_COD_TIPO_ESP IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+
+PROCEDURE SFSP_LIST_TIPO_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+PROCEDURE SFSP_LIST_ETAPA_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+PROCEDURE SFSP_LST_NIVEL_ALC_XFILTRO(p_vIN_DE_FILTRO IN VARCHAR2,
+                                     p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+FUNCTION  SFFU_INSR_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_DESCRIP_CONV IN VARCHAR2,
+                                 p_vIN_CO_UUOO IN VARCHAR2,
+                                 p_vIN_CO_UBICACION IN VARCHAR2,
+                                 p_dFE_INI_IN IN DATE,
+                                 p_dFE_FIN_IN IN DATE,
+                                 p_vIN_ESTADO IN VARCHAR2,
+                                 p_nIN_COD_ETAPA IN  INTEGER,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_COLEGIATURA IN VARCHAR2,
+                                 p_vIN_CO_SUB_GERENCIA IN VARCHAR2,
+                                 p_vIN_DE_UUOO IN VARCHAR2,
+                                 p_vIN_DE_UBICACION IN VARCHAR2,
+                                 p_nIN_CA_ANOS_EXP_GEN IN  INTEGER,
+                                 p_nIN_CA_ANOS_EXP_ESP IN  INTEGER,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+FUNCTION  SFFU_INSR_PERFIL_NIVEL(p_nIN_CO_NIVEL_ALC IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION  SFFU_INSR_PERFIL_AREA(p_nIN_COD_AREA IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION  SFFU_INSR_PERFIL_CARGO(p_nIN_COD_CARGO IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION  SFFU_INSR_PERFIL_ESPECIALIDAD(p_nIN_COD_ESPECIALIDAD IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION  SFFU_INSR_PERFIL_TIP_ESP(p_nIN_COD_TIPO_ESP IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION  SFFU_INSR_PERFIL_INSTITUCION(p_nIN_COD_TIPO_INST IN  INTEGER,
+                                 p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_LISTADO_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_INSERT_PDF_BASE_CONV(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_blIN_PDF IN BLOB,
+                                 p_blIN_RUTA_PDF IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION SFFU_GET_CADENA_PERFIL_NIVEL(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION SFFU_GET_CADENA_PERFIL_AREA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION SFFU_GET_CADENA_PERFIL_CARGO(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION SFFU_GET_CADENA_PERFIL_ESP(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION SFFU_GET_CADENA_PERFIL_TIP_ESP(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION SFFU_GET_CADENA_PERFIL_INSTI(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_FIND_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) ;
+
+FUNCTION SFFU_UPDT_PDF_ARCHIVO_CONV(p_vIN_NUM_CONV IN VARCHAR2,
+                                    p_vIN_ANIO_CONV IN VARCHAR2,
+                                    p_vIN_TIPO_CONV IN VARCHAR2,
+                                    p_vIN_US_MOD IN VARCHAR2,
+                                    p_blNOM_PDF_ARCHIVO IN VARCHAR2,
+                                    p_blIN_PDF_ARCHIVO IN BLOB,
+                                    p_blIN_RUTA_PDF IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_EDITAR_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) ;
+
+FUNCTION SFFU_CADENA_LISTA_NIV_ESTUDIO(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN VARCHAR2;
+
+FUNCTION  SFFU_UPDT_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_DESCRIP_CONV IN VARCHAR2,
+                                 p_vIN_CO_UUOO IN VARCHAR2,
+                                 p_vIN_CO_UBICACION IN VARCHAR2,
+                                 p_dFE_INI_IN IN DATE,
+                                 p_dFE_FIN_IN IN DATE,
+                                 p_vIN_ESTADO IN VARCHAR2,
+                                 p_nIN_COD_ETAPA IN  INTEGER,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_COLEGIATURA IN VARCHAR2,
+                                 p_vIN_CO_SUB_GERENCIA IN VARCHAR2,
+                                 p_vIN_DE_UUOO IN VARCHAR2,
+                                 p_vIN_DE_UBICACION IN VARCHAR2,
+                                 p_nIN_CA_ANOS_EXP_GEN IN  INTEGER,
+                                 p_nIN_CA_ANOS_EXP_ESP IN  INTEGER,
+                                 p_vIN_US_MOD IN VARCHAR2,
+                                 p_vIN_PRF_NIVEL_SLC IN VARCHAR2,
+                                 p_vIN_PRF_AREA_SLC IN VARCHAR2,
+                                 p_vIN_PRF_CARGO_SLC IN VARCHAR2,
+                                 p_vIN_PRF_ESP_SLC IN VARCHAR2,
+                                 p_vIN_PRF_TIP_ESP_SLC IN VARCHAR2,
+                                 p_vIN_PRF_INSTI_SLC IN VARCHAR2,
+                                 p_blIN_PDF IN BLOB,
+                                 p_blIN_RUTA_PDF IN VARCHAR2)
+RETURN VARCHAR2;
+/*
+PROCEDURE SFSP_LIST_TIPO_ARCHIVO_CONV(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+PROCEDURE SFSP_FIND_NOMBRE_ARCHIVO(p_nIN_COD_ARCHIVO IN  VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+PROCEDURE SFSP_CARGAR_PDF_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                                       p_vIN_TIPO_DOC IN VARCHAR2,
+                                       p_crOUT_CURSOR_AA OUT SYS_REFCURSOR );
+
+
+FUNCTION SFFU_VALIDAR_PDF_ARCHIVO(p_vIN_NUM_CONV IN VARCHAR2,
+                                    p_vIN_ANIO_CONV IN VARCHAR2,
+                                    p_vIN_TIPO_CONV IN VARCHAR2)
+RETURN NUMBER;
+
+PROCEDURE SFSP_VERIFICA_ARCHIVO(p_vIN_NUM_CONV IN VARCHAR2,
+                                    p_vIN_ANIO_CONV IN VARCHAR2,
+                                    p_crOUT_CURSOR_LISTA OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_EXISTE_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                  p_vIN_ANIO_CONV IN VARCHAR2)
+RETURN NUMBER;
+/*
+FUNCTION  SFFU_INSR_ENTREGA_DOCUMENTO(
+                                 p_vIN_COD_VALIDACION IN VARCHAR2,
+                                 p_vIN_NUMERO_FICHA IN VARCHAR2,
+                                 p_vIN_ANIO_FICHA IN VARCHAR2,
+                                 p_dFE_ENTREGA IN DATE,
+                                 p_vIN_DE_OBSERVACION IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_LISTADO_ENTREGA_DOCUMENTO(p_cIN_ESP IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+PROCEDURE SFSP_CARGAR_PDF_ENTREGA(p_nIN_COD_VALIDACION IN  VARCHAR2,
+                                   p_nIN_NUM_FICHA IN  VARCHAR2,
+                                   p_nIN_ANIO_FICHA IN  VARCHAR2,
+                                   p_crOUT_CURSOR_AA OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_EXISTE_POSTULANTE(p_nIN_COD_VALIDACION IN  VARCHAR2,
+                                   p_nIN_NUM_FICHA IN  VARCHAR2,
+                                   p_nIN_ANIO_FICHA IN  VARCHAR2)
+RETURN NUMBER ;
+
+FUNCTION SFFU_EXISTE_REGISTRO_ENTREGA(p_nIN_COD_VALIDACION IN  VARCHAR2,
+                                   p_nIN_NUM_FICHA IN  VARCHAR2,
+                                   p_nIN_ANIO_FICHA IN  VARCHAR2)
+ RETURN NUMBER;
+
+FUNCTION  SFFU_INSR_ASISTENTE(p_vIN_CO_ASISTENTE IN VARCHAR2,
+                              p_vIN_NOM_ASISTENTE IN VARCHAR2,
+                              p_vIN_PERFIL IN VARCHAR2,
+                              p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;
+PROCEDURE SFSP_LISTADO_ASISTENTE(p_cIN_ASIST IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION SFFU_BUSCA_EMPLEADO(p_nIN_COD_EMPLEADO IN  VARCHAR2)
+RETURN VARCHAR2;
+
+PROCEDURE SFSP_FIND_ASISTENTE(p_nIN_CO_ASISTENTE IN  VARCHAR2,
+                                 p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) ;
+
+FUNCTION SFFU_UPDT_ASISTENTE(p_vIN_CO_ASISTENTE IN VARCHAR2,
+                              p_vIN_NOM_ASISTENTE IN VARCHAR2,
+                              p_vIN_PERFIL IN VARCHAR2,
+                              p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+FUNCTION SFFU_DELETE_ASISTENTE(p_vIN_CO_ASISTENTE IN  INTEGER,
+                               p_vIN_US_MOD IN VARCHAR2)
+RETURN NUMBER;
+
+PROCEDURE SFSP_FILTRO_CONV_ANIO_NUMERO(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                                       p_nIN_COD_ETAPA IN  INTEGER,
+                                       p_vIN_CO_TIPO IN VARCHAR2,
+                                  p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR);
+
+PROCEDURE SFSP_FILTRO_CONV_FECHAS(p_dFE_INI_IN IN DATE,
+                                       p_dFE_FIN_IN IN DATE,
+                                       p_nIN_COD_ETAPA IN  INTEGER,
+                                       p_vIN_CO_TIPO IN VARCHAR2,
+                                  p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR);
+
+PROCEDURE SFSP_LISTADO_FILT_CONVOCATORIA(
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR ) ;
+
+PROCEDURE SFSP_COMBO_ASISTENTE(p_cIN_ASIST IN CHAR,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+
+FUNCTION  SFFU_INSR_ASIG_CONVOCATORIA(p_vIN_NUM_CONV IN VARCHAR2,
+                                 p_vIN_ANIO_CONV IN VARCHAR2,
+                                 p_vIN_CO_TIPO IN VARCHAR2,
+                                 p_vIN_CO_ASISTENTE IN VARCHAR2,
+                                 p_vIN_US_CREA IN VARCHAR2)
+RETURN VARCHAR2;  */
+PROCEDURE SFSP_LIST_ESPECIALIDAD_XCONV(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                           p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR );
+PROCEDURE SFSP_FILTRO_CONV_ANIO_NUMERO(p_vIN_NUM_CONV IN VARCHAR2,
+                                       p_vIN_ANIO_CONV IN VARCHAR2,
+                                       p_nIN_COD_ETAPA IN  INTEGER,
+                                       p_vIN_CO_TIPO IN VARCHAR2,
+                                  p_crCURSOR_PRINCIPAL OUT SYS_REFCURSOR);
+END RHPK_CONVOCATORIAS;
