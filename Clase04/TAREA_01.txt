@@ -9,7 +9,11 @@ dinero proyecto y la cantidad
 de dinero recaudado del 
 proyecto EDUCA.
 
+-- PROYECTADO
+SELECT * FROM EDUCA.MATRICULA;
 
+-- RECAUDADO
+SELECT * FROM EDUCA.PAGO;
 
 
 
