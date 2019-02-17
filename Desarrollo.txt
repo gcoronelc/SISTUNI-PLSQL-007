@@ -33,6 +33,8 @@ CLASE 04
 ---------------------------------------
 - Colecciones
 - Paquetes
+- Manejo de varios datos con SPLIT
+- Funciones que retornan cursores
 
 
 
